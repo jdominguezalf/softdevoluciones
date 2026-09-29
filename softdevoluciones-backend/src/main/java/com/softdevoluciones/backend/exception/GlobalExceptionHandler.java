@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.time.LocalDateTime;
-
+import org.springframework.security.authentication.BadCredentialsException;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -87,5 +87,23 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(
                 HttpStatus.INTERNAL_SERVER_ERROR
         ).body(error);
+    }
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<ErrorResponse> manejarCredencialesInvalidas(
+            BadCredentialsException ex,
+            HttpServletRequest request
+    ) {
+
+        ErrorResponse error = new ErrorResponse(
+                LocalDateTime.now(),
+                HttpStatus.UNAUTHORIZED.value(),
+                "No autorizado",
+                "Correo o contraseña incorrectos",
+                request.getRequestURI()
+        );
+
+        return ResponseEntity
+                .status(HttpStatus.UNAUTHORIZED)
+                .body(error);
     }
 }
