@@ -1,0 +1,20 @@
+# IntelliJ
+.idea/
+*.iml
+
+# Backend
+**/target/
+
+# Frontend
+**/node_modules/
+**/dist/
+**/.angular/
+
+# Variables locales y secretos
+.env
+*.env
+**/application-local.properties
+
+# Sistema
+.DS_Store
+Thumbs.db
