@@ -1,5 +1,6 @@
 package com.softdevoluciones.backend.service;
 
+import com.softdevoluciones.backend.dto.CambiarEstadoDevolucionRequest;
 import com.softdevoluciones.backend.dto.CrearDevolucionRequest;
 import com.softdevoluciones.backend.dto.DetalleDevolucionRequest;
 import com.softdevoluciones.backend.dto.DetalleDevolucionResponse;
@@ -8,7 +9,9 @@ import com.softdevoluciones.backend.entity.Compra;
 import com.softdevoluciones.backend.entity.DetalleCompra;
 import com.softdevoluciones.backend.entity.DetalleDevolucion;
 import com.softdevoluciones.backend.entity.EstadoDevolucion;
+import com.softdevoluciones.backend.entity.MotivoDevolucion;
 import com.softdevoluciones.backend.entity.SolicitudDevolucion;
+import com.softdevoluciones.backend.entity.Usuario;
 import com.softdevoluciones.backend.exception.RecursoNoEncontradoException;
 import com.softdevoluciones.backend.exception.ReglaNegocioException;
 import com.softdevoluciones.backend.repository.CompraRepository;
@@ -16,13 +19,18 @@ import com.softdevoluciones.backend.repository.DetalleCompraRepository;
 import com.softdevoluciones.backend.repository.DetalleDevolucionRepository;
 import com.softdevoluciones.backend.repository.SolicitudDevolucionRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -30,7 +38,7 @@ public class SolicitudDevolucionService {
 
     private final CompraRepository compraRepository;
     private final DetalleCompraRepository detalleCompraRepository;
-    private final SolicitudDevolucionRepository solicitudRepository;
+    private final SolicitudDevolucionRepository solicitudDevolucionRepository;
     private final DetalleDevolucionRepository detalleDevolucionRepository;
 
     @Transactional
@@ -40,64 +48,76 @@ public class SolicitudDevolucionService {
     ) {
 
         Compra compra = compraRepository
-                .findByIdAndUsuarioId(request.getCompraId(), usuarioId)
+                .findByIdAndUsuarioId(
+                        request.getCompraId(),
+                        usuarioId
+                )
                 .orElseThrow(() ->
                         new RecursoNoEncontradoException(
-                                "La compra no existe o no pertenece al usuario"
+                                "Compra no encontrada o no pertenece al usuario"
                         )
                 );
 
-        SolicitudDevolucion solicitud = SolicitudDevolucion.builder()
-                .fechaSolicitud(LocalDateTime.now())
-                .estado(EstadoDevolucion.SOLICITADA)
-                .motivo(request.getMotivo())
-                .comentario(request.getComentario())
-                .importe(BigDecimal.ZERO)
-                .compra(compra)
-                .usuario(compra.getUsuario())
-                .detalles(new ArrayList<>())
-                .build();
+        validarDetallesDuplicados(request);
+
+        Usuario usuario = compra.getUsuario();
+
+        SolicitudDevolucion solicitud =
+                SolicitudDevolucion.builder()
+                        .fechaSolicitud(LocalDateTime.now())
+                        .estado(EstadoDevolucion.SOLICITADA)
+                        .motivo(request.getMotivo())
+                        .comentario(
+                                limpiarTexto(request.getComentario())
+                        )
+                        .importe(BigDecimal.ZERO)
+                        .compra(compra)
+                        .usuario(usuario)
+                        .build();
 
         BigDecimal importeTotal = BigDecimal.ZERO;
 
-        for (DetalleDevolucionRequest detalleRequest : request.getDetalles()) {
+        for (DetalleDevolucionRequest detalleRequest :
+                request.getDetalles()) {
 
-            DetalleCompra detalleCompra = detalleCompraRepository
-                    .findByIdAndCompraId(
-                            detalleRequest.getDetalleCompraId(),
-                            compra.getId()
-                    )
-                    .orElseThrow(() ->
-                            new RecursoNoEncontradoException(
-                                    "El producto indicado no pertenece a la compra"
+            DetalleCompra detalleCompra =
+                    detalleCompraRepository
+                            .findByIdAndCompraId(
+                                    detalleRequest.getDetalleCompraId(),
+                                    compra.getId()
                             )
-                    );
-
-            Integer cantidadYaDevuelta =
-                    detalleDevolucionRepository
-                            .sumarCantidadDevueltaAprobada(detalleCompra.getId());
-
-            if (cantidadYaDevuelta == null) {
-                cantidadYaDevuelta = 0;
-            }
+                            .orElseThrow(() ->
+                                    new ReglaNegocioException(
+                                            "El producto indicado no pertenece a la compra"
+                                    )
+                            );
 
             int cantidadDisponible =
-                    detalleCompra.getCantidad() - cantidadYaDevuelta;
+                    obtenerCantidadDisponible(
+                            detalleCompra
+                    );
 
             if (detalleRequest.getCantidad() <= 0) {
                 throw new ReglaNegocioException(
-                        "La cantidad debe ser mayor que cero"
+                        "La cantidad a devolver debe ser mayor que cero"
                 );
             }
 
-            if (detalleRequest.getCantidad() > cantidadDisponible) {
+            if (detalleRequest.getCantidad()
+                    > cantidadDisponible) {
+
                 throw new ReglaNegocioException(
-                        "La cantidad solicitada supera la cantidad disponible para devolución"
+                        "La cantidad solicitada supera las unidades disponibles "
+                                + "para devolución del producto "
+                                + detalleCompra
+                                .getProducto()
+                                .getNombre()
                 );
             }
 
             BigDecimal importeDetalle =
-                    detalleCompra.getPrecioUnitario()
+                    detalleCompra
+                            .getPrecioUnitario()
                             .multiply(
                                     BigDecimal.valueOf(
                                             detalleRequest.getCantidad()
@@ -106,30 +126,46 @@ public class SolicitudDevolucionService {
 
             DetalleDevolucion detalleDevolucion =
                     DetalleDevolucion.builder()
-                            .cantidad(detalleRequest.getCantidad())
+                            .cantidad(
+                                    detalleRequest.getCantidad()
+                            )
                             .importe(importeDetalle)
                             .solicitud(solicitud)
                             .detalleCompra(detalleCompra)
                             .build();
 
-            solicitud.getDetalles().add(detalleDevolucion);
+            solicitud
+                    .getDetalles()
+                    .add(detalleDevolucion);
 
-            importeTotal = importeTotal.add(importeDetalle);
+            importeTotal =
+                    importeTotal.add(
+                            importeDetalle
+                    );
         }
 
-        solicitud.setImporte(importeTotal);
+        solicitud.setImporte(
+                importeTotal
+        );
 
         SolicitudDevolucion guardada =
-                solicitudRepository.save(solicitud);
+                solicitudDevolucionRepository
+                        .save(solicitud);
 
-        return mapearSolicitud(guardada);
+        return mapearSolicitud(
+                guardada
+        );
     }
 
     @Transactional(readOnly = true)
-    public List<SolicitudDevolucionResponse> listarPorUsuario(Long usuarioId) {
+    public List<SolicitudDevolucionResponse> listarPorUsuario(
+            Long usuarioId
+    ) {
 
-        return solicitudRepository
-                .findByUsuarioIdOrderByFechaSolicitudDesc(usuarioId)
+        return solicitudDevolucionRepository
+                .findByUsuarioIdOrderByFechaSolicitudDesc(
+                        usuarioId
+                )
                 .stream()
                 .map(this::mapearSolicitud)
                 .toList();
@@ -141,15 +177,334 @@ public class SolicitudDevolucionService {
             Long usuarioId
     ) {
 
-        SolicitudDevolucion solicitud = solicitudRepository
-                .findByIdAndUsuarioId(solicitudId, usuarioId)
-                .orElseThrow(() ->
-                        new RecursoNoEncontradoException(
-                                "Solicitud no encontrada o no pertenece al usuario"
+        SolicitudDevolucion solicitud =
+                solicitudDevolucionRepository
+                        .findByIdAndUsuarioId(
+                                solicitudId,
+                                usuarioId
                         )
-                );
+                        .orElseThrow(() ->
+                                new RecursoNoEncontradoException(
+                                        "Solicitud de devolución no encontrada "
+                                                + "o no pertenece al usuario"
+                                )
+                        );
 
-        return mapearSolicitud(solicitud);
+        return mapearSolicitud(
+                solicitud
+        );
+    }
+
+    @Transactional(readOnly = true)
+    public Page<SolicitudDevolucionResponse> listarAdministrativas(
+            EstadoDevolucion estado,
+            MotivoDevolucion motivo,
+            LocalDate desde,
+            LocalDate hasta,
+            Pageable pageable
+    ) {
+
+        if (desde != null
+                && hasta != null
+                && desde.isAfter(hasta)) {
+
+            throw new ReglaNegocioException(
+                    "La fecha desde no puede ser posterior a la fecha hasta"
+            );
+        }
+
+        Specification<SolicitudDevolucion> specification =
+                (root, query, cb) -> cb.conjunction();
+
+        if (estado != null) {
+
+            specification =
+                    specification.and(
+                            (root, query, cb) ->
+                                    cb.equal(
+                                            root.get("estado"),
+                                            estado
+                                    )
+                    );
+        }
+
+        if (motivo != null) {
+
+            specification =
+                    specification.and(
+                            (root, query, cb) ->
+                                    cb.equal(
+                                            root.get("motivo"),
+                                            motivo
+                                    )
+                    );
+        }
+
+        if (desde != null) {
+
+            LocalDateTime fechaDesde =
+                    desde.atStartOfDay();
+
+            specification =
+                    specification.and(
+                            (root, query, cb) ->
+                                    cb.greaterThanOrEqualTo(
+                                            root.get("fechaSolicitud"),
+                                            fechaDesde
+                                    )
+                    );
+        }
+
+        if (hasta != null) {
+
+            LocalDateTime fechaHasta =
+                    hasta
+                            .plusDays(1)
+                            .atStartOfDay();
+
+            specification =
+                    specification.and(
+                            (root, query, cb) ->
+                                    cb.lessThan(
+                                            root.get("fechaSolicitud"),
+                                            fechaHasta
+                                    )
+                    );
+        }
+
+        return solicitudDevolucionRepository
+                .findAll(
+                        specification,
+                        pageable
+                )
+                .map(this::mapearSolicitud);
+    }
+
+    @Transactional
+    public SolicitudDevolucionResponse cambiarEstado(
+            Long solicitudId,
+            CambiarEstadoDevolucionRequest request
+    ) {
+
+        SolicitudDevolucion solicitud =
+                solicitudDevolucionRepository
+                        .findById(solicitudId)
+                        .orElseThrow(() ->
+                                new RecursoNoEncontradoException(
+                                        "Solicitud de devolución no encontrada"
+                                )
+                        );
+
+        EstadoDevolucion estadoActual =
+                solicitud.getEstado();
+
+        EstadoDevolucion nuevoEstado =
+                request.getEstado();
+
+        validarTransicion(
+                estadoActual,
+                nuevoEstado
+        );
+
+        if (nuevoEstado
+                == EstadoDevolucion.RECHAZADA) {
+
+            if (request.getObservacion() == null
+                    || request
+                    .getObservacion()
+                    .isBlank()) {
+
+                throw new ReglaNegocioException(
+                        "La observación es obligatoria al rechazar una devolución"
+                );
+            }
+
+            solicitud.setObservacionOperador(
+                    request
+                            .getObservacion()
+                            .trim()
+            );
+        }
+
+        if (nuevoEstado
+                == EstadoDevolucion.APROBADA) {
+
+            validarCantidadesAntesDeAprobar(
+                    solicitud
+            );
+
+            if (request.getObservacion() != null
+                    && !request
+                    .getObservacion()
+                    .isBlank()) {
+
+                solicitud.setObservacionOperador(
+                        request
+                                .getObservacion()
+                                .trim()
+                );
+            }
+        }
+
+        if (nuevoEstado
+                == EstadoDevolucion.EN_REVISION
+                || nuevoEstado
+                == EstadoDevolucion.COMPLETADA) {
+
+            if (request.getObservacion() != null
+                    && !request
+                    .getObservacion()
+                    .isBlank()) {
+
+                solicitud.setObservacionOperador(
+                        request
+                                .getObservacion()
+                                .trim()
+                );
+            }
+        }
+
+        solicitud.setEstado(
+                nuevoEstado
+        );
+
+        SolicitudDevolucion actualizada =
+                solicitudDevolucionRepository
+                        .save(solicitud);
+
+        return mapearSolicitud(
+                actualizada
+        );
+    }
+
+    private void validarTransicion(
+            EstadoDevolucion estadoActual,
+            EstadoDevolucion nuevoEstado
+    ) {
+
+        boolean transicionValida =
+                switch (estadoActual) {
+
+                    case SOLICITADA ->
+                            nuevoEstado
+                                    == EstadoDevolucion.EN_REVISION;
+
+                    case EN_REVISION ->
+                            nuevoEstado
+                                    == EstadoDevolucion.APROBADA
+                                    || nuevoEstado
+                                    == EstadoDevolucion.RECHAZADA;
+
+                    case APROBADA ->
+                            nuevoEstado
+                                    == EstadoDevolucion.COMPLETADA;
+
+                    case RECHAZADA, COMPLETADA ->
+                            false;
+                };
+
+        if (!transicionValida) {
+
+            throw new ReglaNegocioException(
+                    "No se puede cambiar el estado de "
+                            + estadoActual
+                            + " a "
+                            + nuevoEstado
+            );
+        }
+    }
+
+    private void validarCantidadesAntesDeAprobar(
+            SolicitudDevolucion solicitud
+    ) {
+
+        for (DetalleDevolucion detalle :
+                solicitud.getDetalles()) {
+
+            DetalleCompra detalleCompra =
+                    detalle.getDetalleCompra();
+
+            Integer cantidadDevuelta =
+                    detalleDevolucionRepository
+                            .sumarCantidadDevueltaAprobada(
+                                    detalleCompra.getId()
+                            );
+
+            int devuelto =
+                    cantidadDevuelta != null
+                            ? cantidadDevuelta
+                            : 0;
+
+            int disponible =
+                    detalleCompra.getCantidad()
+                            - devuelto;
+
+            if (detalle.getCantidad()
+                    > disponible) {
+
+                throw new ReglaNegocioException(
+                        "No existen suficientes unidades disponibles "
+                                + "para aprobar la devolución del producto "
+                                + detalleCompra
+                                .getProducto()
+                                .getNombre()
+                );
+            }
+        }
+    }
+
+    private int obtenerCantidadDisponible(
+            DetalleCompra detalleCompra
+    ) {
+
+        Integer cantidadDevuelta =
+                detalleDevolucionRepository
+                        .sumarCantidadDevueltaAprobada(
+                                detalleCompra.getId()
+                        );
+
+        int devuelto =
+                cantidadDevuelta != null
+                        ? cantidadDevuelta
+                        : 0;
+
+        return detalleCompra.getCantidad()
+                - devuelto;
+    }
+
+    private void validarDetallesDuplicados(
+            CrearDevolucionRequest request
+    ) {
+
+        Set<Long> detalleIds =
+                new HashSet<>();
+
+        for (DetalleDevolucionRequest detalle :
+                request.getDetalles()) {
+
+            if (!detalleIds.add(
+                    detalle.getDetalleCompraId()
+            )) {
+
+                throw new ReglaNegocioException(
+                        "No se puede repetir el mismo producto "
+                                + "dentro de una solicitud de devolución"
+                );
+            }
+        }
+    }
+
+    private String limpiarTexto(
+            String texto
+    ) {
+
+        if (texto == null
+                || texto.isBlank()) {
+
+            return null;
+        }
+
+        return texto.trim();
     }
 
     private SolicitudDevolucionResponse mapearSolicitud(
@@ -157,35 +512,67 @@ public class SolicitudDevolucionService {
     ) {
 
         List<DetalleDevolucionResponse> detalles =
-                solicitud.getDetalles()
+                solicitud
+                        .getDetalles()
                         .stream()
                         .map(detalle ->
-                                DetalleDevolucionResponse.builder()
-                                        .id(detalle.getId())
+                                DetalleDevolucionResponse
+                                        .builder()
+                                        .id(
+                                                detalle.getId()
+                                        )
                                         .detalleCompraId(
-                                                detalle.getDetalleCompra().getId()
+                                                detalle
+                                                        .getDetalleCompra()
+                                                        .getId()
                                         )
                                         .productoNombre(
-                                                detalle.getDetalleCompra()
+                                                detalle
+                                                        .getDetalleCompra()
                                                         .getProducto()
                                                         .getNombre()
                                         )
-                                        .cantidad(detalle.getCantidad())
-                                        .importe(detalle.getImporte())
+                                        .cantidad(
+                                                detalle.getCantidad()
+                                        )
+                                        .importe(
+                                                detalle.getImporte()
+                                        )
                                         .build()
                         )
                         .toList();
 
-        return SolicitudDevolucionResponse.builder()
-                .id(solicitud.getId())
-                .compraId(solicitud.getCompra().getId())
-                .fechaSolicitud(solicitud.getFechaSolicitud())
-                .estado(solicitud.getEstado())
-                .motivo(solicitud.getMotivo())
-                .comentario(solicitud.getComentario())
-                .observacionOperador(solicitud.getObservacionOperador())
-                .importe(solicitud.getImporte())
-                .detalles(detalles)
+        return SolicitudDevolucionResponse
+                .builder()
+                .id(
+                        solicitud.getId()
+                )
+                .compraId(
+                        solicitud
+                                .getCompra()
+                                .getId()
+                )
+                .fechaSolicitud(
+                        solicitud.getFechaSolicitud()
+                )
+                .estado(
+                        solicitud.getEstado()
+                )
+                .motivo(
+                        solicitud.getMotivo()
+                )
+                .comentario(
+                        solicitud.getComentario()
+                )
+                .observacionOperador(
+                        solicitud.getObservacionOperador()
+                )
+                .importe(
+                        solicitud.getImporte()
+                )
+                .detalles(
+                        detalles
+                )
                 .build();
     }
 }
