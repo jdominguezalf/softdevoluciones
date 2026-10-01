@@ -1,31 +1,48 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, inject, signal } from '@angular/core';
-
+import {
+  Component,
+  OnInit,
+  inject,
+  signal
+} from '@angular/core';
 import { FormsModule } from '@angular/forms';
-
 import { Router } from '@angular/router';
 
-import { SolicitudDevolucionResponse } from '../../core/models/devolucion.model';
+import {
+  SolicitudDevolucionResponse
+} from '../../core/models/devolucion.model';
 
-import { DevolucionService } from '../../core/services/devolucion.service';
+import {
+  DevolucionService
+} from '../../core/services/devolucion.service';
 
-import { AuthService } from '../../core/services/auth.service';
+import {
+  AuthService
+} from '../../core/services/auth.service';
 
 @Component({
   selector: 'app-devoluciones-admin',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [
+    CommonModule,
+    FormsModule
+  ],
   templateUrl: './devoluciones-admin.component.html',
-  styleUrl: './devoluciones-admin.component.scss',
+  styleUrl: './devoluciones-admin.component.scss'
 })
 export class DevolucionesAdminComponent implements OnInit {
-  private readonly devolucionService = inject(DevolucionService);
 
-  private readonly authService = inject(AuthService);
+  private readonly devolucionService =
+    inject(DevolucionService);
 
-  private readonly router = inject(Router);
+  private readonly authService =
+    inject(AuthService);
 
-  devoluciones = signal<SolicitudDevolucionResponse[]>([]);
+  private readonly router =
+    inject(Router);
+
+  devoluciones =
+    signal<SolicitudDevolucionResponse[]>([]);
 
   cargando = signal(true);
   error = signal('');
@@ -43,30 +60,54 @@ export class DevolucionesAdminComponent implements OnInit {
     this.cargarDevoluciones();
   }
 
-  cargarDevoluciones(pagina: number = 0): void {
+  cargarDevoluciones(
+    pagina: number = 0
+  ): void {
+
     this.cargando.set(true);
     this.error.set('');
 
     this.devolucionService
-      .listarAdministrativas(this.estado, this.motivo, this.desde, this.hasta, pagina, 10)
+      .listarAdministrativas(
+        this.estado,
+        this.motivo,
+        this.desde,
+        this.hasta,
+        pagina,
+        10
+      )
       .subscribe({
-        next: (response) => {
-          this.devoluciones.set(response.content);
 
-          this.paginaActual.set(response.number);
+        next: response => {
 
-          this.totalPaginas.set(response.totalPages);
+          this.devoluciones.set(
+            response.content
+          );
 
-          this.totalElementos.set(response.totalElements);
+          this.paginaActual.set(
+            response.number
+          );
+
+          this.totalPaginas.set(
+            response.totalPages
+          );
+
+          this.totalElementos.set(
+            response.totalElements
+          );
 
           this.cargando.set(false);
         },
 
-        error: (err) => {
+        error: err => {
+
           this.cargando.set(false);
 
-          this.error.set(err?.error?.mensaje ?? 'No se pudieron cargar las devoluciones');
-        },
+          this.error.set(
+            err?.error?.mensaje
+            ?? 'No se pudieron cargar las devoluciones'
+          );
+        }
       });
   }
 
@@ -75,6 +116,7 @@ export class DevolucionesAdminComponent implements OnInit {
   }
 
   limpiarFiltros(): void {
+
     this.estado = '';
     this.motivo = '';
     this.desde = '';
@@ -84,56 +126,104 @@ export class DevolucionesAdminComponent implements OnInit {
   }
 
   paginaAnterior(): void {
+
     if (this.paginaActual() > 0) {
-      this.cargarDevoluciones(this.paginaActual() - 1);
+
+      this.cargarDevoluciones(
+        this.paginaActual() - 1
+      );
     }
   }
 
   paginaSiguiente(): void {
-    if (this.paginaActual() + 1 < this.totalPaginas()) {
-      this.cargarDevoluciones(this.paginaActual() + 1);
+
+    if (
+      this.paginaActual() + 1
+      < this.totalPaginas()
+    ) {
+
+      this.cargarDevoluciones(
+        this.paginaActual() + 1
+      );
     }
   }
 
   cambiarEstado(
     devolucion: SolicitudDevolucionResponse,
-    nuevoEstado: 'EN_REVISION' | 'APROBADA' | 'RECHAZADA' | 'COMPLETADA',
+    nuevoEstado:
+      'EN_REVISION'
+      | 'APROBADA'
+      | 'RECHAZADA'
+      | 'COMPLETADA'
   ): void {
+
     let observacion = '';
 
     if (nuevoEstado === 'RECHAZADA') {
-      observacion = window.prompt('Ingrese el motivo del rechazo:') ?? '';
+
+      observacion =
+        window.prompt(
+          'Ingrese el motivo del rechazo:'
+        ) ?? '';
 
       if (!observacion.trim()) {
         return;
       }
     }
 
-    const confirmar = window.confirm(`¿Cambiar la devolución #${devolucion.id} a ${nuevoEstado}?`);
+    const confirmar =
+      window.confirm(
+        `¿Cambiar la devolución #${devolucion.id} a ${nuevoEstado}?`
+      );
 
     if (!confirmar) {
       return;
     }
 
     this.devolucionService
-      .cambiarEstado(devolucion.id, {
-        estado: nuevoEstado,
-        observacion,
-      })
+      .cambiarEstado(
+        devolucion.id,
+        {
+          estado: nuevoEstado,
+          observacion
+        }
+      )
       .subscribe({
+
         next: () => {
-          this.cargarDevoluciones(this.paginaActual());
+
+          this.cargarDevoluciones(
+            this.paginaActual()
+          );
         },
 
-        error: (err) => {
-          this.error.set(err?.error?.mensaje ?? 'No se pudo cambiar el estado');
-        },
+        error: err => {
+
+          this.error.set(
+            err?.error?.mensaje
+            ?? 'No se pudo cambiar el estado'
+          );
+        }
       });
   }
 
+  esAdmin(): boolean {
+    return this.authService.tieneRol('ADMIN');
+  }
+
+  irPanel(): void {
+
+    this.router.navigate([
+      '/admin'
+    ]);
+  }
+
   cerrarSesion(): void {
+
     this.authService.logout();
 
-    this.router.navigate(['/login']);
+    this.router.navigate([
+      '/login'
+    ]);
   }
 }

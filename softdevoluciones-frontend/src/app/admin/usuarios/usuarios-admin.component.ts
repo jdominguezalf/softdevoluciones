@@ -51,4 +51,7 @@ export class UsuariosAdminComponent implements OnInit {
   irDevoluciones(): void {
     this.router.navigate(['/admin/devoluciones']);
   }
+  irPanel(): void {
+    this.router.navigate(['/admin']);
+  }
 }

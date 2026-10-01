@@ -13,19 +13,14 @@ import { CompraService } from '../../core/services/compra.service';
 @Component({
   selector: 'app-compras-admin',
   standalone: true,
-  imports: [
-    CommonModule
-  ],
+  imports: [CommonModule],
   templateUrl: './compras-admin.component.html',
-  styleUrl: './compras-admin.component.scss'
+  styleUrl: './compras-admin.component.scss',
 })
 export class ComprasAdminComponent implements OnInit {
+  private readonly compraService = inject(CompraService);
 
-  private readonly compraService =
-    inject(CompraService);
-
-  private readonly router =
-    inject(Router);
+  private readonly router = inject(Router);
 
   compras = signal<Compra[]>([]);
 
@@ -37,53 +32,35 @@ export class ComprasAdminComponent implements OnInit {
   }
 
   cargarCompras(): void {
-
     this.cargando.set(true);
     this.error.set('');
 
-    this.compraService
-      .listarTodasLasCompras()
-      .subscribe({
+    this.compraService.listarTodasLasCompras().subscribe({
+      next: (response) => {
+        this.compras.set(response);
+        this.cargando.set(false);
+      },
 
-        next: response => {
+      error: (err) => {
+        this.cargando.set(false);
 
-          this.compras.set(response);
-          this.cargando.set(false);
-        },
-
-        error: err => {
-
-          this.cargando.set(false);
-
-          this.error.set(
-            err?.error?.mensaje
-            ?? 'No se pudieron cargar las compras'
-          );
-        }
-      });
+        this.error.set(err?.error?.mensaje ?? 'No se pudieron cargar las compras');
+      },
+    });
   }
 
-  verDetalle(
-    id: number
-  ): void {
-
-    this.router.navigate([
-      '/admin/compras',
-      id
-    ]);
+  verDetalle(id: number): void {
+    this.router.navigate(['/admin/compras', id]);
   }
 
   irDevoluciones(): void {
-
-    this.router.navigate([
-      '/admin/devoluciones'
-    ]);
+    this.router.navigate(['/admin/devoluciones']);
   }
 
   irUsuarios(): void {
-
-    this.router.navigate([
-      '/admin/usuarios'
-    ]);
+    this.router.navigate(['/admin/usuarios']);
+  }
+  irPanel(): void {
+    this.router.navigate(['/admin']);
   }
 }

@@ -19,5 +19,17 @@ export const roleGuard: CanActivateFn = (route) => {
     return true;
   }
 
-  return router.createUrlTree(['/acceso-denegado']);
+  switch (usuario.rol) {
+    case 'CLIENTE':
+      return router.createUrlTree(['/cliente/compras']);
+
+    case 'OPERADOR':
+      return router.createUrlTree(['/admin/devoluciones']);
+
+    case 'ADMIN':
+      return router.createUrlTree(['/admin']);
+
+    default:
+      return router.createUrlTree(['/login']);
+  }
 };

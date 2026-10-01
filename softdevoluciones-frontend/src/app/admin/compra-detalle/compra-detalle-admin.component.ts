@@ -52,4 +52,5 @@ export class CompraDetalleAdminComponent implements OnInit {
   volver(): void {
     this.router.navigate(['/admin/compras']);
   }
+
 }
