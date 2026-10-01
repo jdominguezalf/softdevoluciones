@@ -70,4 +70,27 @@ public class CompraService {
                 .detalles(detalles)
                 .build();
     }
+    @Transactional(readOnly = true)
+    public List<CompraResponse> listarTodasLasCompras() {
+
+        return compraRepository
+                .findAll()
+                .stream()
+                .map(this::mapearCompra)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public CompraResponse obtenerCompraPorId(Long compraId) {
+
+        Compra compra = compraRepository
+                .findById(compraId)
+                .orElseThrow(() ->
+                        new RecursoNoEncontradoException(
+                                "Compra no encontrada"
+                        )
+                );
+
+        return mapearCompra(compra);
+    }
 }
