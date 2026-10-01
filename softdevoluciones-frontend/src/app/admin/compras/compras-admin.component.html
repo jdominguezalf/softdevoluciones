@@ -1,0 +1,122 @@
+<div class="pagina">
+
+  <header class="encabezado">
+
+    <div>
+      <h1>Compras registradas</h1>
+
+      <p>
+        Consulta las compras registradas en el sistema.
+      </p>
+    </div>
+
+    <div class="navegacion">
+
+      <button
+        type="button"
+        (click)="irDevoluciones()"
+      >
+        Devoluciones
+      </button>
+
+      <button
+        type="button"
+        (click)="irUsuarios()"
+      >
+        Usuarios
+      </button>
+
+    </div>
+
+  </header>
+
+  @if (cargando()) {
+
+    <div class="mensaje">
+      Cargando compras...
+    </div>
+
+  } @else if (error()) {
+
+    <div class="error">
+      {{ error() }}
+    </div>
+
+  } @else if (compras().length === 0) {
+
+    <div class="mensaje">
+      No existen compras registradas.
+    </div>
+
+  } @else {
+
+    <div class="tabla-contenedor">
+
+      <table>
+
+        <thead>
+        <tr>
+          <th>ID</th>
+          <th>Fecha</th>
+          <th>Estado</th>
+          <th>Total</th>
+          <th>Acciones</th>
+        </tr>
+        </thead>
+
+        <tbody>
+
+          @for (
+            compra of compras();
+            track compra.id
+            ) {
+
+            <tr>
+
+              <td>
+                {{ compra.id }}
+              </td>
+
+              <td>
+                {{
+                  compra.fecha
+                    | date:'dd/MM/yyyy HH:mm'
+                }}
+              </td>
+
+              <td>
+                {{ compra.estado }}
+              </td>
+
+              <td>
+                S/
+                {{
+                  compra.total
+                    | number:'1.2-2'
+                }}
+              </td>
+
+              <td>
+
+                <button
+                  type="button"
+                  (click)="verDetalle(compra.id)"
+                >
+                  Ver detalle
+                </button>
+
+              </td>
+
+            </tr>
+
+          }
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+  }
+
+</div>

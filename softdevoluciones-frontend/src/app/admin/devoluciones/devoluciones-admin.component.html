@@ -1,0 +1,339 @@
+<div class="pagina">
+
+  <header class="encabezado">
+
+    <div>
+      <h1>Gestión de devoluciones</h1>
+
+      <p>
+        Revisa y administra las solicitudes registradas.
+      </p>
+    </div>
+
+    <button
+      type="button"
+      class="cerrar"
+      (click)="cerrarSesion()"
+    >
+      Cerrar sesión
+    </button>
+
+  </header>
+
+  <section class="filtros">
+
+    <div>
+
+      <label>Estado</label>
+
+      <select [(ngModel)]="estado">
+
+        <option value="">
+          Todos
+        </option>
+
+        <option value="SOLICITADA">
+          Solicitada
+        </option>
+
+        <option value="EN_REVISION">
+          En revisión
+        </option>
+
+        <option value="APROBADA">
+          Aprobada
+        </option>
+
+        <option value="RECHAZADA">
+          Rechazada
+        </option>
+
+        <option value="COMPLETADA">
+          Completada
+        </option>
+
+      </select>
+
+    </div>
+
+    <div>
+
+      <label>Motivo</label>
+
+      <select [(ngModel)]="motivo">
+
+        <option value="">
+          Todos
+        </option>
+
+        <option value="PRODUCTO_DEFECTUOSO">
+          Producto defectuoso
+        </option>
+
+        <option value="PRODUCTO_INCORRECTO">
+          Producto incorrecto
+        </option>
+
+        <option value="PRODUCTO_DANADO">
+          Producto dañado
+        </option>
+
+        <option value="NO_CUMPLE_EXPECTATIVAS">
+          No cumple expectativas
+        </option>
+
+        <option value="OTRO">
+          Otro
+        </option>
+
+      </select>
+
+    </div>
+
+    <div>
+
+      <label>Desde</label>
+
+      <input
+        type="date"
+        [(ngModel)]="desde"
+      >
+
+    </div>
+
+    <div>
+
+      <label>Hasta</label>
+
+      <input
+        type="date"
+        [(ngModel)]="hasta"
+      >
+
+    </div>
+
+    <div class="acciones-filtro">
+
+      <button
+        type="button"
+        (click)="aplicarFiltros()"
+      >
+        Filtrar
+      </button>
+
+      <button
+        type="button"
+        (click)="limpiarFiltros()"
+      >
+        Limpiar
+      </button>
+
+    </div>
+
+  </section>
+
+  @if (error()) {
+
+    <div class="error">
+      {{ error() }}
+    </div>
+
+  }
+
+  @if (cargando()) {
+
+    <div class="mensaje">
+      Cargando devoluciones...
+    </div>
+
+  } @else {
+
+    <div class="tabla-contenedor">
+
+      <table>
+
+        <thead>
+
+        <tr>
+          <th>ID</th>
+          <th>Compra</th>
+          <th>Fecha</th>
+          <th>Motivo</th>
+          <th>Estado</th>
+          <th>Importe</th>
+          <th>Acciones</th>
+        </tr>
+
+        </thead>
+
+        <tbody>
+
+          @for (
+            devolucion of devoluciones();
+            track devolucion.id
+            ) {
+
+            <tr>
+
+              <td>
+                {{ devolucion.id }}
+              </td>
+
+              <td>
+                #{{ devolucion.compraId }}
+              </td>
+
+              <td>
+                {{
+                  devolucion.fechaSolicitud
+                    | date:'dd/MM/yyyy HH:mm'
+                }}
+              </td>
+
+              <td>
+                {{ devolucion.motivo }}
+              </td>
+
+              <td>
+                {{ devolucion.estado }}
+              </td>
+
+              <td>
+                S/
+                {{
+                  devolucion.importe
+                    | number:'1.2-2'
+                }}
+              </td>
+
+              <td>
+
+                <div class="acciones">
+
+                  @if (
+                    devolucion.estado
+                    === 'SOLICITADA'
+                    ) {
+
+                    <button
+                      type="button"
+                      (click)="
+                        cambiarEstado(
+                          devolucion,
+                          'EN_REVISION'
+                        )
+                      "
+                    >
+                      Revisar
+                    </button>
+
+                  }
+
+                  @if (
+                    devolucion.estado
+                    === 'EN_REVISION'
+                    ) {
+
+                    <button
+                      type="button"
+                      (click)="
+                        cambiarEstado(
+                          devolucion,
+                          'APROBADA'
+                        )
+                      "
+                    >
+                      Aprobar
+                    </button>
+
+                    <button
+                      type="button"
+                      (click)="
+                        cambiarEstado(
+                          devolucion,
+                          'RECHAZADA'
+                        )
+                      "
+                    >
+                      Rechazar
+                    </button>
+
+                  }
+
+                  @if (
+                    devolucion.estado
+                    === 'APROBADA'
+                    ) {
+
+                    <button
+                      type="button"
+                      (click)="
+                        cambiarEstado(
+                          devolucion,
+                          'COMPLETADA'
+                        )
+                      "
+                    >
+                      Completar
+                    </button>
+
+                  }
+
+                </div>
+
+              </td>
+
+            </tr>
+
+          } @empty {
+
+            <tr>
+              <td
+                colspan="7"
+                class="sin-resultados"
+              >
+                No se encontraron devoluciones.
+              </td>
+            </tr>
+
+          }
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+    <div class="paginacion">
+
+      <button
+        type="button"
+        [disabled]="paginaActual() === 0"
+        (click)="paginaAnterior()"
+      >
+        Anterior
+      </button>
+
+      <span>
+        Página
+        {{ paginaActual() + 1 }}
+        de
+        {{ totalPaginas() || 1 }}
+      </span>
+
+      <button
+        type="button"
+        [disabled]="
+          paginaActual() + 1
+          >= totalPaginas()
+        "
+        (click)="paginaSiguiente()"
+      >
+        Siguiente
+      </button>
+
+    </div>
+
+  }
+
+</div>

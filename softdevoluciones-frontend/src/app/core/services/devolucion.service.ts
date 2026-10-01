@@ -1,14 +1,21 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
-import { CrearDevolucionRequest, SolicitudDevolucionResponse } from '../models/devolucion.model';
+import {
+  CambiarEstadoDevolucionRequest,
+  CrearDevolucionRequest,
+  PaginaDevoluciones,
+  SolicitudDevolucionResponse,
+} from '../models/devolucion.model';
 
 @Injectable({
   providedIn: 'root',
 })
 export class DevolucionService {
   private readonly apiUrl = 'http://localhost:8080/api/devoluciones';
+
+  private readonly adminUrl = 'http://localhost:8080/api/admin/devoluciones';
 
   constructor(private http: HttpClient) {}
 
@@ -22,5 +29,41 @@ export class DevolucionService {
 
   obtenerDevolucion(id: number): Observable<SolicitudDevolucionResponse> {
     return this.http.get<SolicitudDevolucionResponse>(`${this.apiUrl}/${id}`);
+  }
+
+  listarAdministrativas(
+    estado?: string,
+    motivo?: string,
+    desde?: string,
+    hasta?: string,
+    page = 0,
+    size = 10,
+  ): Observable<PaginaDevoluciones> {
+    let params = new HttpParams().set('page', page).set('size', size);
+
+    if (estado) {
+      params = params.set('estado', estado);
+    }
+
+    if (motivo) {
+      params = params.set('motivo', motivo);
+    }
+
+    if (desde) {
+      params = params.set('desde', desde);
+    }
+
+    if (hasta) {
+      params = params.set('hasta', hasta);
+    }
+
+    return this.http.get<PaginaDevoluciones>(this.adminUrl, { params });
+  }
+
+  cambiarEstado(
+    id: number,
+    request: CambiarEstadoDevolucionRequest,
+  ): Observable<SolicitudDevolucionResponse> {
+    return this.http.patch<SolicitudDevolucionResponse>(`${this.adminUrl}/${id}/estado`, request);
   }
 }

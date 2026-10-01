@@ -1,0 +1,105 @@
+<div class="pagina">
+
+  <header class="encabezado">
+
+    <div>
+      <h1>Usuarios</h1>
+
+      <p>
+        Consulta los usuarios registrados en el sistema.
+      </p>
+    </div>
+
+    <div class="navegacion">
+
+      <button
+        type="button"
+        (click)="irCompras()"
+      >
+        Compras
+      </button>
+
+      <button
+        type="button"
+        (click)="irDevoluciones()"
+      >
+        Devoluciones
+      </button>
+
+    </div>
+
+  </header>
+
+  @if (cargando()) {
+
+    <div class="mensaje">
+      Cargando usuarios...
+    </div>
+
+  } @else if (error()) {
+
+    <div class="error">
+      {{ error() }}
+    </div>
+
+  } @else {
+
+    <div class="tabla-contenedor">
+
+      <table>
+
+        <thead>
+        <tr>
+          <th>ID</th>
+          <th>Nombre</th>
+          <th>Correo</th>
+          <th>Rol</th>
+        </tr>
+        </thead>
+
+        <tbody>
+
+          @for (
+            usuario of usuarios();
+            track usuario.id
+            ) {
+
+            <tr>
+
+              <td>
+                {{ usuario.id }}
+              </td>
+
+              <td>
+                {{ usuario.nombre }}
+              </td>
+
+              <td>
+                {{ usuario.email }}
+              </td>
+
+              <td>
+                {{ usuario.rol }}
+              </td>
+
+            </tr>
+
+          } @empty {
+
+            <tr>
+              <td colspan="4">
+                No existen usuarios registrados.
+              </td>
+            </tr>
+
+          }
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+  }
+
+</div>

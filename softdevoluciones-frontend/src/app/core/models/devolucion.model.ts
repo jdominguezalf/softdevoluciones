@@ -39,3 +39,22 @@ export interface SolicitudDevolucionResponse {
   compraId: number;
   detalles: DetalleDevolucionResponse[];
 }
+export interface CambiarEstadoDevolucionRequest {
+  estado:
+    | 'EN_REVISION'
+    | 'APROBADA'
+    | 'RECHAZADA'
+    | 'COMPLETADA';
+
+  observacion?: string;
+}
+
+export interface PaginaDevoluciones {
+  content: SolicitudDevolucionResponse[];
+  totalElements: number;
+  totalPages: number;
+  number: number;
+  size: number;
+  first: boolean;
+  last: boolean;
+}

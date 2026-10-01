@@ -1,0 +1,71 @@
+<div class="pagina">
+
+  <header class="encabezado">
+
+    <div>
+      <h1>Panel de administración</h1>
+      <p>
+        Gestiona las principales funciones del sistema.
+      </p>
+    </div>
+
+    <button
+      type="button"
+      class="cerrar"
+      (click)="cerrarSesion()"
+    >
+      Cerrar sesión
+    </button>
+
+  </header>
+
+  <section class="opciones">
+
+    <article
+      class="tarjeta"
+      (click)="irDevoluciones()"
+    >
+      <h2>Devoluciones</h2>
+
+      <p>
+        Revisar solicitudes, aplicar filtros y gestionar estados.
+      </p>
+
+      <button type="button">
+        Gestionar devoluciones
+      </button>
+    </article>
+
+    <article
+      class="tarjeta"
+      (click)="irCompras()"
+    >
+      <h2>Compras</h2>
+
+      <p>
+        Consultar las compras registradas y sus detalles.
+      </p>
+
+      <button type="button">
+        Ver compras
+      </button>
+    </article>
+
+    <article
+      class="tarjeta"
+      (click)="irUsuarios()"
+    >
+      <h2>Usuarios</h2>
+
+      <p>
+        Consultar los usuarios registrados y sus roles.
+      </p>
+
+      <button type="button">
+        Ver usuarios
+      </button>
+    </article>
+
+  </section>
+
+</div>

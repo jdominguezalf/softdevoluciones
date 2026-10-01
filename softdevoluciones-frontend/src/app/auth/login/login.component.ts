@@ -36,6 +36,7 @@ export class LoginComponent {
 
     const request = {
       email: this.formulario.controls.email.value ?? '',
+
       password: this.formulario.controls.password.value ?? '',
     };
 
@@ -49,8 +50,11 @@ export class LoginComponent {
             break;
 
           case 'OPERADOR':
-          case 'ADMIN':
             this.router.navigate(['/admin/devoluciones']);
+            break;
+
+          case 'ADMIN':
+            this.router.navigate(['/admin']);
             break;
         }
       },
