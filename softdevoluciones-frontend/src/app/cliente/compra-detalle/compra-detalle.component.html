@@ -1,0 +1,132 @@
+<div class="pagina">
+
+  <div class="acciones-superiores">
+
+    <button
+      type="button"
+      class="volver"
+      (click)="volver()"
+    >
+      Volver a mis compras
+    </button>
+
+  </div>
+
+  @if (cargando()) {
+
+    <div class="mensaje">
+      Cargando detalle de compra...
+    </div>
+
+  } @else if (error()) {
+
+    <div class="error">
+      {{ error() }}
+    </div>
+
+  } @else if (compra()) {
+
+    <div class="encabezado">
+
+      <div>
+        <h1>
+          Compra #{{ compra()!.id }}
+        </h1>
+
+        <p>
+          Revisa los productos incluidos en esta compra.
+        </p>
+      </div>
+
+      <button
+        type="button"
+        class="devolucion"
+        (click)="solicitarDevolucion()"
+      >
+        Solicitar devolución
+      </button>
+
+    </div>
+
+    <div class="resumen">
+
+      <div>
+        <span>Fecha</span>
+        <strong>
+          {{ compra()!.fecha | date:'dd/MM/yyyy HH:mm' }}
+        </strong>
+      </div>
+
+      <div>
+        <span>Estado</span>
+        <strong>
+          {{ compra()!.estado }}
+        </strong>
+      </div>
+
+      <div>
+        <span>Total</span>
+        <strong>
+          S/ {{ compra()!.total | number:'1.2-2' }}
+        </strong>
+      </div>
+
+    </div>
+
+    <div class="tabla-contenedor">
+
+      <table>
+
+        <thead>
+        <tr>
+          <th>Producto</th>
+          <th>Cantidad</th>
+          <th>Precio unitario</th>
+          <th>Subtotal</th>
+        </tr>
+        </thead>
+
+        <tbody>
+
+          @for (
+            detalle of compra()!.detalles;
+            track detalle.id
+            ) {
+
+            <tr>
+
+              <td>
+                {{ detalle.productoNombre }}
+              </td>
+
+              <td>
+                {{ detalle.cantidad }}
+              </td>
+
+              <td>
+                S/
+                {{ detalle.precioUnitario | number:'1.2-2' }}
+              </td>
+
+              <td>
+                S/
+                {{
+                  detalle.cantidad
+                  * detalle.precioUnitario
+                    | number:'1.2-2'
+                }}
+              </td>
+
+            </tr>
+
+          }
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+  }
+
+</div>

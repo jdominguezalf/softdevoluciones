@@ -7,13 +7,25 @@
       <p>Consulta las compras asociadas a tu cuenta.</p>
     </div>
 
-    <button
-      class="cerrar"
-      type="button"
-      (click)="cerrarSesion()"
-    >
-      Cerrar sesión
-    </button>
+    <div class="acciones">
+
+      <button
+        type="button"
+        class="devoluciones"
+        (click)="verMisDevoluciones()"
+      >
+        Mis devoluciones
+      </button>
+
+      <button
+        class="cerrar"
+        type="button"
+        (click)="cerrarSesion()"
+      >
+        Cerrar sesión
+      </button>
+
+    </div>
 
   </header>
 

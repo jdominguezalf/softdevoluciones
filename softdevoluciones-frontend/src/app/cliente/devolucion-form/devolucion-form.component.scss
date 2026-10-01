@@ -1,0 +1,109 @@
+.pagina {
+  min-height: 100vh;
+  background: #f5f6f8;
+  padding: 32px;
+}
+
+.contenedor {
+  max-width: 900px;
+  margin: 20px auto;
+  background: #ffffff;
+  padding: 28px;
+  border-radius: 12px;
+}
+
+.volver {
+  padding: 9px 15px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.campo {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 20px;
+
+  label {
+    margin-bottom: 6px;
+    font-weight: 600;
+  }
+
+  select,
+  textarea {
+    padding: 10px;
+    border: 1px solid #cccccc;
+    border-radius: 7px;
+  }
+}
+
+.productos {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.producto {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 16px;
+  border: 1px solid #eeeeee;
+  border-radius: 10px;
+}
+
+.producto-info {
+  display: flex;
+  gap: 12px;
+
+  p {
+    margin: 4px 0;
+    color: #666666;
+  }
+}
+
+.cantidad {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+
+  input {
+    width: 100px;
+    padding: 8px;
+  }
+}
+
+.error {
+  margin-top: 18px;
+  padding: 12px;
+  background: #fdeaea;
+  color: #b71c1c;
+  border-radius: 8px;
+}
+
+.exito {
+  margin-top: 18px;
+  padding: 12px;
+  background: #e9f7ef;
+  color: #1b5e20;
+  border-radius: 8px;
+}
+
+.enviar {
+  margin-top: 24px;
+  padding: 12px 18px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+@media (max-width: 700px) {
+
+  .pagina {
+    padding: 18px;
+  }
+
+  .producto {
+    flex-direction: column;
+  }
+}

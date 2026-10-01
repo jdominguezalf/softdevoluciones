@@ -14,14 +14,11 @@ import { AuthService } from '../../core/services/auth.service';
 @Component({
   selector: 'app-compras',
   standalone: true,
-  imports: [
-    CommonModule
-  ],
+  imports: [CommonModule],
   templateUrl: './compras.component.html',
-  styleUrl: './compras.component.scss'
+  styleUrl: './compras.component.scss',
 })
 export class ComprasComponent implements OnInit {
-
   private readonly compraService = inject(CompraService);
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
@@ -35,46 +32,33 @@ export class ComprasComponent implements OnInit {
   }
 
   cargarCompras(): void {
-
     this.cargando.set(true);
     this.error.set('');
 
-    this.compraService
-      .listarMisCompras()
-      .subscribe({
+    this.compraService.listarMisCompras().subscribe({
+      next: (response) => {
+        this.compras.set(response);
+        this.cargando.set(false);
+      },
 
-        next: response => {
+      error: (err) => {
+        this.cargando.set(false);
 
-          this.compras.set(response);
-          this.cargando.set(false);
-        },
-
-        error: err => {
-
-          this.cargando.set(false);
-
-          this.error.set(
-            err?.error?.mensaje
-            ?? 'No se pudieron cargar las compras'
-          );
-        }
-      });
+        this.error.set(err?.error?.mensaje ?? 'No se pudieron cargar las compras');
+      },
+    });
   }
 
   verDetalle(id: number): void {
-
-    this.router.navigate([
-      '/cliente/compras',
-      id
-    ]);
+    this.router.navigate(['/cliente/compras', id]);
   }
 
   cerrarSesion(): void {
-
     this.authService.logout();
 
-    this.router.navigate([
-      '/login'
-    ]);
+    this.router.navigate(['/login']);
+  }
+  verMisDevoluciones(): void {
+    this.router.navigate(['/cliente/devoluciones']);
   }
 }

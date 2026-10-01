@@ -1,0 +1,127 @@
+<div class="pagina">
+
+  <header class="encabezado">
+
+    <div>
+      <h1>Mis devoluciones</h1>
+      <p>
+        Consulta el estado de tus solicitudes.
+      </p>
+    </div>
+
+    <button
+      type="button"
+      (click)="volverCompras()"
+    >
+      Mis compras
+    </button>
+
+  </header>
+
+  @if (cargando()) {
+
+    <div class="mensaje">
+      Cargando devoluciones...
+    </div>
+
+  } @else if (error()) {
+
+    <div class="error">
+      {{ error() }}
+    </div>
+
+  } @else if (devoluciones().length === 0) {
+
+    <div class="mensaje">
+      No tienes solicitudes de devolución.
+    </div>
+
+  } @else {
+
+    <div class="tabla-contenedor">
+
+      <table>
+
+        <thead>
+        <tr>
+          <th>ID</th>
+          <th>Compra</th>
+          <th>Fecha</th>
+          <th>Motivo</th>
+          <th>Estado</th>
+          <th>Importe</th>
+        </tr>
+        </thead>
+
+        <tbody>
+
+          @for (
+            devolucion of devoluciones();
+            track devolucion.id
+            ) {
+
+            <tr>
+
+              <td>
+                {{ devolucion.id }}
+              </td>
+
+              <td>
+                #{{ devolucion.compraId }}
+              </td>
+
+              <td>
+                {{
+                  devolucion.fechaSolicitud
+                    | date:'dd/MM/yyyy HH:mm'
+                }}
+              </td>
+
+              <td>
+                {{ devolucion.motivo }}
+              </td>
+
+              <td>
+                <span
+                  class="estado"
+                  [class.solicitada]="
+                    devolucion.estado === 'SOLICITADA'
+                  "
+                  [class.revision]="
+                    devolucion.estado === 'EN_REVISION'
+                  "
+                  [class.aprobada]="
+                    devolucion.estado === 'APROBADA'
+                  "
+                  [class.rechazada]="
+                    devolucion.estado === 'RECHAZADA'
+                  "
+                  [class.completada]="
+                    devolucion.estado === 'COMPLETADA'
+                  "
+                >
+                  {{ devolucion.estado }}
+                </span>
+              </td>
+
+              <td>
+                S/
+                {{
+                  devolucion.importe
+                    | number:'1.2-2'
+                }}
+              </td>
+
+            </tr>
+
+          }
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+  }
+
+</div>

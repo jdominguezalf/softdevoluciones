@@ -1,0 +1,190 @@
+<div class="pagina">
+
+  <button
+    type="button"
+    class="volver"
+    (click)="volver()"
+  >
+    Volver
+  </button>
+
+  @if (cargando()) {
+
+    <div class="mensaje">
+      Cargando compra...
+    </div>
+
+  } @else if (compra()) {
+
+    <div class="contenedor">
+
+      <h1>
+        Solicitar devolución
+      </h1>
+
+      <p>
+        Compra #{{ compra()!.id }}
+      </p>
+
+      <form
+        [formGroup]="formulario"
+        (ngSubmit)="enviar()"
+      >
+
+        <div class="campo">
+
+          <label>
+            Motivo
+          </label>
+
+          <select
+            formControlName="motivo"
+          >
+
+            <option value="">
+              Selecciona un motivo
+            </option>
+
+            <option value="PRODUCTO_DEFECTUOSO">
+              Producto defectuoso
+            </option>
+
+            <option value="PRODUCTO_INCORRECTO">
+              Producto incorrecto
+            </option>
+
+            <option value="PRODUCTO_DANADO">
+              Producto dañado
+            </option>
+
+            <option value="NO_CUMPLE_EXPECTATIVAS">
+              No cumple expectativas
+            </option>
+
+            <option value="OTRO">
+              Otro
+            </option>
+
+          </select>
+
+        </div>
+
+        <div class="campo">
+
+          <label>
+            Comentario
+          </label>
+
+          <textarea
+            formControlName="comentario"
+            rows="4"
+            placeholder="Describe brevemente el motivo de la devolución"
+          ></textarea>
+
+        </div>
+
+        <h2>
+          Productos
+        </h2>
+
+        <div
+          formArrayName="detalles"
+          class="productos"
+        >
+
+          @for (
+            detalle of compra()!.detalles;
+            track detalle.id;
+            let i = $index
+            ) {
+
+            <div
+              class="producto"
+              [formGroupName]="i"
+            >
+
+              <div class="producto-info">
+
+                <input
+                  type="checkbox"
+                  formControlName="seleccionado"
+                >
+
+                <div>
+
+                  <strong>
+                    {{ detalle.productoNombre }}
+                  </strong>
+
+                  <p>
+                    Cantidad comprada:
+                    {{ detalle.cantidad }}
+                  </p>
+
+                  <p>
+                    S/
+                    {{ detalle.precioUnitario | number:'1.2-2' }}
+                  </p>
+
+                </div>
+
+              </div>
+
+              <div class="cantidad">
+
+                <label>
+                  Cantidad a devolver
+                </label>
+
+                <input
+                  type="number"
+                  min="1"
+                  [max]="detalle.cantidad"
+                  formControlName="cantidad"
+                >
+
+              </div>
+
+            </div>
+
+          }
+
+        </div>
+
+        @if (error()) {
+
+          <div class="error">
+            {{ error() }}
+          </div>
+
+        }
+
+        @if (exito()) {
+
+          <div class="exito">
+            {{ exito() }}
+          </div>
+
+        }
+
+        <button
+          type="submit"
+          class="enviar"
+          [disabled]="enviando()"
+        >
+
+          @if (enviando()) {
+            Enviando...
+          } @else {
+            Registrar devolución
+          }
+
+        </button>
+
+      </form>
+
+    </div>
+
+  }
+
+</div>

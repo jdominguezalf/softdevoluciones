@@ -19,14 +19,13 @@
     margin: 0;
     color: #666666;
   }
-}
 
-.cerrar {
-  padding: 10px 16px;
-  border: 1px solid #cccccc;
-  background: #ffffff;
-  border-radius: 8px;
-  cursor: pointer;
+  button {
+    padding: 10px 16px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+  }
 }
 
 .tabla-contenedor {
@@ -52,17 +51,38 @@ th {
   background: #fafafa;
 }
 
-td button {
-  padding: 8px 12px;
-  border: none;
+.estado {
+  display: inline-block;
+  padding: 5px 9px;
   border-radius: 6px;
-  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.solicitada {
+  background: #fff3cd;
+}
+
+.revision {
+  background: #dbeafe;
+}
+
+.aprobada {
+  background: #dcfce7;
+}
+
+.rechazada {
+  background: #fee2e2;
+}
+
+.completada {
+  background: #e5e7eb;
 }
 
 .mensaje,
 .error {
-  padding: 20px;
   background: #ffffff;
+  padding: 20px;
   border-radius: 10px;
 }
 
@@ -80,17 +100,4 @@ td button {
     flex-direction: column;
     align-items: flex-start;
   }
-}
-.acciones {
-  display: flex;
-  gap: 10px;
-}
-
-.devoluciones {
-  padding: 10px 16px;
-  border: none;
-  background: #222222;
-  color: #ffffff;
-  border-radius: 8px;
-  cursor: pointer;
 }
