@@ -2,15 +2,17 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
+import { environment } from '../../../environments/environment';
+
 import { Compra } from '../models/compra.model';
 
 @Injectable({
   providedIn: 'root',
 })
 export class CompraService {
-  private readonly apiUrl = 'http://localhost:8080/api/compras';
+  private readonly apiUrl = `${environment.apiUrl}/api/compras`;
 
-  private readonly adminUrl = 'http://localhost:8080/api/admin/compras';
+  private readonly adminUrl = `${environment.apiUrl}/api/admin/compras`;
 
   constructor(private http: HttpClient) {}
 

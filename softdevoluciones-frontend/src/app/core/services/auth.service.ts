@@ -2,6 +2,8 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
 
+import { environment } from '../../../environments/environment';
+
 import { AuthResponse } from '../models/auth-response.model';
 import { LoginRequest } from '../models/login-request.model';
 import { RegistroRequest } from '../models/registro-request.model';
@@ -11,7 +13,7 @@ import { Usuario } from '../models/usuario.model';
   providedIn: 'root',
 })
 export class AuthService {
-  private readonly apiUrl = 'http://localhost:8080/api/auth';
+  private readonly apiUrl = `${environment.apiUrl}/api/auth`;
 
   private readonly tokenKey = 'softdevoluciones_token';
   private readonly usuarioKey = 'softdevoluciones_usuario';
@@ -75,6 +77,8 @@ export class AuthService {
     try {
       return JSON.parse(usuario);
     } catch {
+      localStorage.removeItem(this.usuarioKey);
+
       return null;
     }
   }
