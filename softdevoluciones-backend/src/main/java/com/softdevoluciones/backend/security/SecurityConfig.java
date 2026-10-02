@@ -153,10 +153,11 @@ public class SecurityConfig {
         CorsConfiguration configuration =
                 new CorsConfiguration();
 
-        configuration.setAllowedOrigins(
+        configuration.setAllowedOriginPatterns(
                 List.of(
                         "http://localhost:4200",
-                        "https://softdevoluciones.vercel.app"
+                        "https://softdevoluciones.vercel.app",
+                        "https://softdevoluciones-*.vercel.app"
                 )
         );
 
@@ -186,6 +187,10 @@ public class SecurityConfig {
 
         configuration.setAllowCredentials(
                 true
+        );
+
+        configuration.setMaxAge(
+                3600L
         );
 
         UrlBasedCorsConfigurationSource source =
