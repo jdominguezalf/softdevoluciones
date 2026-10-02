@@ -1,0 +1,156 @@
+<div class="client-shell">
+
+  <aside class="sidebar">
+
+    <div class="brand">
+
+      <div class="brand-logo">
+        SD
+      </div>
+
+      <div class="brand-copy">
+
+        <strong>
+          SoftDevoluciones
+        </strong>
+
+        <span>
+          Portal del cliente
+        </span>
+
+      </div>
+
+    </div>
+
+    <div class="menu-section">
+
+      <span class="menu-label">
+        Mi cuenta
+      </span>
+
+      <nav class="menu">
+
+        <a
+          routerLink="/cliente/compras"
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{
+            exact: true
+          }"
+        >
+
+          <span class="menu-icon">
+            ▣
+          </span>
+
+          <span>
+            Mis compras
+          </span>
+
+        </a>
+
+        <a
+          routerLink="/cliente/devoluciones"
+          routerLinkActive="active"
+        >
+
+          <span class="menu-icon">
+            ↺
+          </span>
+
+          <span>
+            Mis devoluciones
+          </span>
+
+        </a>
+
+      </nav>
+
+    </div>
+
+    <div class="sidebar-bottom">
+
+      <div class="profile-card">
+
+        <div class="profile-avatar">
+
+          {{
+            usuario?.nombre?.charAt(0)
+            || 'C'
+          }}
+
+        </div>
+
+        <div class="profile-info">
+
+          <strong>
+            {{ usuario?.nombre }}
+          </strong>
+
+          <span>
+            Cliente
+          </span>
+
+        </div>
+
+      </div>
+
+      <button
+        type="button"
+        class="logout-button"
+        (click)="cerrarSesion()"
+      >
+        Cerrar sesión
+      </button>
+
+    </div>
+
+  </aside>
+
+  <div class="workspace">
+
+    <header class="topbar">
+
+      <div class="topbar-content">
+
+        <span class="topbar-eyebrow">
+          SoftDevoluciones
+        </span>
+
+        <strong class="topbar-title">
+          Portal de devoluciones
+        </strong>
+
+      </div>
+
+      <div class="topbar-profile">
+
+        <div class="topbar-avatar">
+          {{
+            usuario?.nombre?.charAt(0)
+            || 'C'
+          }}
+        </div>
+
+        <div class="topbar-user">
+
+          <strong>
+            {{ usuario?.nombre }}
+          </strong>
+
+          <span>
+            {{ usuario?.email }}
+          </span>
+
+        </div>
+
+      </div>
+
+    </header>
+
+    <main class="content">
+      <router-outlet></router-outlet>
+    </main>
+
+  </div>
+
+</div>

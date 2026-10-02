@@ -40,12 +40,66 @@ export class DevolucionesComponent implements OnInit {
       error: (err) => {
         this.cargando.set(false);
 
-        this.error.set(err?.error?.mensaje ?? 'No se pudieron cargar las devoluciones');
+        this.error.set(err?.error?.mensaje ?? 'No se pudieron cargar tus devoluciones');
       },
     });
   }
 
   volverCompras(): void {
     this.router.navigate(['/cliente/compras']);
+  }
+
+  verDetalle(id: number): void {
+    this.router.navigate(['/cliente/devoluciones', id]);
+  }
+
+  cantidadPorEstado(
+    estado: 'SOLICITADA' | 'EN_REVISION' | 'APROBADA' | 'RECHAZADA' | 'COMPLETADA',
+  ): number {
+    return this.devoluciones().filter((devolucion) => devolucion.estado === estado).length;
+  }
+
+  estadoTexto(estado: string): string {
+    switch (estado) {
+      case 'SOLICITADA':
+        return 'Solicitada';
+
+      case 'EN_REVISION':
+        return 'En revisión';
+
+      case 'APROBADA':
+        return 'Aprobada';
+
+      case 'RECHAZADA':
+        return 'Rechazada';
+
+      case 'COMPLETADA':
+        return 'Completada';
+
+      default:
+        return estado;
+    }
+  }
+
+  motivoTexto(motivo: string): string {
+    switch (motivo) {
+      case 'PRODUCTO_DEFECTUOSO':
+        return 'Producto defectuoso';
+
+      case 'PRODUCTO_INCORRECTO':
+        return 'Producto incorrecto';
+
+      case 'PRODUCTO_DANADO':
+        return 'Producto dañado';
+
+      case 'NO_CUMPLE_EXPECTATIVAS':
+        return 'No cumple expectativas';
+
+      case 'OTRO':
+        return 'Otro';
+
+      default:
+        return motivo;
+    }
   }
 }

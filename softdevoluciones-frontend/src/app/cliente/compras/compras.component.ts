@@ -1,15 +1,9 @@
 import { CommonModule } from '@angular/common';
-import {
-  Component,
-  OnInit,
-  inject,
-  signal
-} from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 
-import { CompraService } from '../../core/services/compra.service';
 import { Compra } from '../../core/models/compra.model';
-import { AuthService } from '../../core/services/auth.service';
+import { CompraService } from '../../core/services/compra.service';
 
 @Component({
   selector: 'app-compras',
@@ -20,7 +14,7 @@ import { AuthService } from '../../core/services/auth.service';
 })
 export class ComprasComponent implements OnInit {
   private readonly compraService = inject(CompraService);
-  private readonly authService = inject(AuthService);
+
   private readonly router = inject(Router);
 
   compras = signal<Compra[]>([]);
@@ -44,7 +38,7 @@ export class ComprasComponent implements OnInit {
       error: (err) => {
         this.cargando.set(false);
 
-        this.error.set(err?.error?.mensaje ?? 'No se pudieron cargar las compras');
+        this.error.set(err?.error?.mensaje ?? 'No se pudieron cargar tus compras');
       },
     });
   }
@@ -53,12 +47,15 @@ export class ComprasComponent implements OnInit {
     this.router.navigate(['/cliente/compras', id]);
   }
 
-  cerrarSesion(): void {
-    this.authService.logout();
-
-    this.router.navigate(['/login']);
-  }
   verMisDevoluciones(): void {
     this.router.navigate(['/cliente/devoluciones']);
+  }
+
+  cantidadEntregadas(): number {
+    return this.compras().filter((compra) => compra.estado === 'ENTREGADA').length;
+  }
+
+  totalGastado(): number {
+    return this.compras().reduce((total, compra) => total + Number(compra.total), 0);
   }
 }

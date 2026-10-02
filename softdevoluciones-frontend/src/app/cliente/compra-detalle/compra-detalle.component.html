@@ -1,10 +1,26 @@
-<div class="pagina">
+<section class="detalle-page">
 
-  <div class="acciones-superiores">
+  <div class="page-header">
+
+    <div>
+
+      <span class="eyebrow">
+        Mis compras
+      </span>
+
+      <h1 class="page-title">
+        Detalle de compra
+      </h1>
+
+      <p class="page-description">
+        Revisa los productos de tu compra y solicita una devolución si corresponde.
+      </p>
+
+    </div>
 
     <button
       type="button"
-      class="volver"
+      class="btn btn-secondary"
       (click)="volver()"
     >
       Volver a mis compras
@@ -12,121 +28,296 @@
 
   </div>
 
-  @if (cargando()) {
+  @if (error()) {
 
-    <div class="mensaje">
-      Cargando detalle de compra...
-    </div>
-
-  } @else if (error()) {
-
-    <div class="error">
+    <div class="alert alert-error">
       {{ error() }}
-    </div>
-
-  } @else if (compra()) {
-
-    <div class="encabezado">
-
-      <div>
-        <h1>
-          Compra #{{ compra()!.id }}
-        </h1>
-
-        <p>
-          Revisa los productos incluidos en esta compra.
-        </p>
-      </div>
-
-      <button
-        type="button"
-        class="devolucion"
-        (click)="solicitarDevolucion()"
-      >
-        Solicitar devolución
-      </button>
-
-    </div>
-
-    <div class="resumen">
-
-      <div>
-        <span>Fecha</span>
-        <strong>
-          {{ compra()!.fecha | date:'dd/MM/yyyy HH:mm' }}
-        </strong>
-      </div>
-
-      <div>
-        <span>Estado</span>
-        <strong>
-          {{ compra()!.estado }}
-        </strong>
-      </div>
-
-      <div>
-        <span>Total</span>
-        <strong>
-          S/ {{ compra()!.total | number:'1.2-2' }}
-        </strong>
-      </div>
-
-    </div>
-
-    <div class="tabla-contenedor">
-
-      <table>
-
-        <thead>
-        <tr>
-          <th>Producto</th>
-          <th>Cantidad</th>
-          <th>Precio unitario</th>
-          <th>Subtotal</th>
-        </tr>
-        </thead>
-
-        <tbody>
-
-          @for (
-            detalle of compra()!.detalles;
-            track detalle.id
-            ) {
-
-            <tr>
-
-              <td>
-                {{ detalle.productoNombre }}
-              </td>
-
-              <td>
-                {{ detalle.cantidad }}
-              </td>
-
-              <td>
-                S/
-                {{ detalle.precioUnitario | number:'1.2-2' }}
-              </td>
-
-              <td>
-                S/
-                {{
-                  detalle.cantidad
-                  * detalle.precioUnitario
-                    | number:'1.2-2'
-                }}
-              </td>
-
-            </tr>
-
-          }
-
-        </tbody>
-
-      </table>
-
     </div>
 
   }
 
-</div>
+  @if (cargando()) {
+
+    <div class="loading-grid">
+
+      <div class="loading-card"></div>
+      <div class="loading-card"></div>
+      <div class="loading-card"></div>
+
+    </div>
+
+  } @else if (compra(); as compraActual) {
+
+    <section class="purchase-summary">
+
+      <div class="summary-main">
+
+        <div>
+
+          <span class="purchase-label">
+            Compra
+          </span>
+
+          <h2>
+            #{{ compraActual.id }}
+          </h2>
+
+          <p>
+            Realizada el
+            {{
+              compraActual.fecha
+                | date:'dd/MM/yyyy'
+            }}
+            a las
+            {{
+              compraActual.fecha
+                | date:'HH:mm'
+            }}
+          </p>
+
+        </div>
+
+        @if (
+          compraActual.estado === 'ENTREGADA'
+          ) {
+
+          <span class="badge badge-success">
+            Entregada
+          </span>
+
+        } @else {
+
+          <span class="badge badge-info">
+            En tránsito
+          </span>
+
+        }
+
+      </div>
+
+      <div class="summary-data">
+
+        <div class="data-item">
+
+          <span>
+            Productos
+          </span>
+
+          <strong>
+            {{ compraActual.detalles.length }}
+          </strong>
+
+        </div>
+
+        <div class="data-item">
+
+          <span>
+            Estado
+          </span>
+
+          <strong>
+            {{
+              compraActual.estado === 'ENTREGADA'
+                ? 'Entregada'
+                : 'En tránsito'
+            }}
+          </strong>
+
+        </div>
+
+        <div class="data-item total">
+
+          <span>
+            Total
+          </span>
+
+          <strong>
+            S/
+            {{
+              compraActual.total
+                | number:'1.2-2'
+            }}
+          </strong>
+
+        </div>
+
+      </div>
+
+    </section>
+
+    <section class="products-card">
+
+      <div class="products-header">
+
+        <div>
+
+          <h2>
+            Productos comprados
+          </h2>
+
+          <p>
+            Estos son los productos asociados a esta compra.
+          </p>
+
+        </div>
+
+        <span class="results-badge">
+          {{ compraActual.detalles.length }}
+          productos
+        </span>
+
+      </div>
+
+      <div class="products-list">
+
+        @for (
+          detalle of compraActual.detalles;
+          track detalle.id
+          ) {
+
+          <article class="product-row">
+
+            <div class="product-main">
+
+              <div class="product-icon">
+                P
+              </div>
+
+              <div class="product-info">
+
+                <strong>
+                  {{ detalle.productoNombre }}
+                </strong>
+
+                <span>
+                  Producto #{{ detalle.productoId }}
+                </span>
+
+              </div>
+
+            </div>
+
+            <div class="product-data">
+
+              <div>
+
+                <span>
+                  Cantidad
+                </span>
+
+                <strong>
+                  {{ detalle.cantidad }}
+                </strong>
+
+              </div>
+
+              <div>
+
+                <span>
+                  Precio unitario
+                </span>
+
+                <strong>
+                  S/
+                  {{
+                    detalle.precioUnitario
+                      | number:'1.2-2'
+                  }}
+                </strong>
+
+              </div>
+
+              <div>
+
+                <span>
+                  Subtotal
+                </span>
+
+                <strong class="subtotal">
+                  S/
+                  {{
+                    detalle.precioUnitario
+                    * detalle.cantidad
+                      | number:'1.2-2'
+                  }}
+                </strong>
+
+              </div>
+
+            </div>
+
+          </article>
+
+        }
+
+      </div>
+
+      <div class="purchase-total">
+
+        <div>
+
+          <span>
+            Importe total
+          </span>
+
+          <strong>
+            S/
+            {{
+              compraActual.total
+                | number:'1.2-2'
+            }}
+          </strong>
+
+        </div>
+
+      </div>
+
+    </section>
+
+    <section class="return-card">
+
+      <div class="return-content">
+
+        <div class="return-icon">
+          ↺
+        </div>
+
+        <div>
+
+          <h3>
+            ¿Necesitas devolver un producto?
+          </h3>
+
+          <p>
+            Selecciona los productos, cantidades y el motivo de tu solicitud.
+          </p>
+
+        </div>
+
+      </div>
+
+      @if (
+        compraActual.estado === 'ENTREGADA'
+        ) {
+
+        <button
+          type="button"
+          class="btn btn-primary"
+          (click)="solicitarDevolucion()"
+        >
+          Solicitar devolución
+        </button>
+
+      } @else {
+
+        <span class="return-disabled">
+          Disponible cuando la compra sea entregada
+        </span>
+
+      }
+
+    </section>
+
+  }
+
+</section>

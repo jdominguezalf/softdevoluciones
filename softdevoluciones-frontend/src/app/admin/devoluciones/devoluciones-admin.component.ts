@@ -217,13 +217,4 @@ export class DevolucionesAdminComponent implements OnInit {
       '/admin'
     ]);
   }
-
-  cerrarSesion(): void {
-
-    this.authService.logout();
-
-    this.router.navigate([
-      '/login'
-    ]);
-  }
 }

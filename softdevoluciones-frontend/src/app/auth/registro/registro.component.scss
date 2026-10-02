@@ -2,7 +2,7 @@
   display: block;
 }
 
-.login-page {
+.register-page {
   min-height: 100vh;
 
   display: grid;
@@ -43,7 +43,7 @@
     ),
     linear-gradient(
       145deg,
-      #ffddd1 0%,
+      #ffffff 0%,
       #fafbfc 38%,
       #f5f7fa 72%,
       #f8f9fb 100%
@@ -53,14 +53,10 @@
     1px solid #e7ebf0;
 }
 
-/* fondos animados */
-
 .visual-glow {
   position: absolute;
 
   border-radius: 50%;
-
-  filter: blur(1px);
 
   pointer-events: none;
 }
@@ -173,8 +169,6 @@
   font-size: 12px;
   font-weight: 800;
 
-  letter-spacing: 0.03em;
-
   box-shadow:
     0 10px 25px
     rgba(249, 115, 22, 0.17);
@@ -188,8 +182,6 @@
     color: #0f172a;
 
     font-size: 14px;
-
-    letter-spacing: -0.01em;
   }
 
   span {
@@ -233,11 +225,11 @@
 
   padding: 6px 10px;
 
+  border-radius: 999px;
+
   border:
     1px solid
     rgba(37, 99, 235, 0.08);
-
-  border-radius: 999px;
 
   background:
     rgba(37, 99, 235, 0.07);
@@ -253,7 +245,7 @@
 }
 
 .hero-copy h1 {
-  max-width: 580px;
+  max-width: 590px;
 
   margin: 0;
 
@@ -280,7 +272,7 @@
 }
 
 .hero-copy p {
-  max-width: 500px;
+  max-width: 510px;
 
   margin: 17px 0 0;
 
@@ -302,9 +294,9 @@
 
   margin-top: 24px;
 
-  border-radius: 24px;
-
   overflow: hidden;
+
+  border-radius: 24px;
 
   background: #ffffff;
 
@@ -349,59 +341,6 @@
     contrast(1.01);
 }
 
-.illustration-wrapper::after {
-  content: '';
-
-  position: absolute;
-
-  inset: 0;
-
-  pointer-events: none;
-
-  border-radius: 24px;
-
-  box-shadow:
-    inset
-    0 0 0 1px
-    rgba(255, 255, 255, 0.6);
-}
-
-/* decoración flotante */
-
-.illustration-decoration {
-  position: absolute;
-
-  z-index: 4;
-
-  border-radius: 50%;
-
-  pointer-events: none;
-}
-
-.decoration-one {
-  width: 150px;
-  height: 150px;
-
-  top: -70px;
-  right: -30px;
-
-  border:
-    1px solid
-    rgba(59, 130, 246, 0.08);
-}
-
-.decoration-two {
-  width: 90px;
-  height: 90px;
-
-  left: 10px;
-  bottom: -40px;
-
-  border:
-    1px solid
-    rgba(249, 115, 22, 0.075);
-}
-
 /* =====================================================
    CARDS FLOTANTES
    ===================================================== */
@@ -435,8 +374,8 @@
 }
 
 .floating-card-one {
+  top: 24px;
   left: 22px;
-  top: 26px;
 
   animation:
     floatCard
@@ -623,7 +562,7 @@
 }
 
 /* =====================================================
-   PANEL DERECHO
+   PANEL FORMULARIO
    ===================================================== */
 
 .form-panel {
@@ -633,28 +572,28 @@
   align-items: center;
   justify-content: center;
 
-  padding: 45px 55px;
+  padding: 42px 55px;
 
   background:
     linear-gradient(
       180deg,
-      #ffe7d3 0%,
-      #ffe7d3 100%
+      #ffffff 0%,
+      #fdfefe 100%
     );
 }
 
-.login-container {
+.register-container {
   width: 100%;
   max-width: 405px;
 
   animation:
-    loginEnter
+    formEnter
     0.7s
     ease-out
     both;
 }
 
-@keyframes loginEnter {
+@keyframes formEnter {
 
   from {
     opacity: 0;
@@ -678,7 +617,7 @@
 
   gap: 10px;
 
-  margin-bottom: 34px;
+  margin-bottom: 32px;
 }
 
 .mobile-brand > div:last-child {
@@ -701,14 +640,14 @@
 }
 
 /* =====================================================
-   CABECERA LOGIN
+   HEADER REGISTRO
    ===================================================== */
 
-.login-header {
-  margin-bottom: 27px;
+.register-header {
+  margin-bottom: 25px;
 }
 
-.login-label {
+.register-label {
   display: block;
 
   margin-bottom: 7px;
@@ -723,19 +662,19 @@
   letter-spacing: 0.1em;
 }
 
-.login-header h2 {
+.register-header h2 {
   margin: 0;
 
   color: #0f172a;
 
   font-size: 32px;
 
-  letter-spacing: -0.04em;
-
   font-weight: 700;
+
+  letter-spacing: -0.04em;
 }
 
-.login-header p {
+.register-header p {
   margin: 8px 0 0;
 
   color: #64748b;
@@ -810,7 +749,7 @@
    ===================================================== */
 
 .field {
-  margin-bottom: 17px;
+  margin-bottom: 16px;
 }
 
 .field label {
@@ -827,10 +766,10 @@
 .input-group {
   height: 50px;
 
+  position: relative;
+
   display: flex;
   align-items: center;
-
-  position: relative;
 
   border:
     1px solid #dbe3ec;
@@ -861,7 +800,7 @@
 }
 
 .input-group.input-error {
-  border-color: #ffffff;
+  border-color: #ef4444;
 
   box-shadow:
     0 0 0 3px
@@ -876,7 +815,8 @@
 
   color: #94a3b8;
 
-  font-size: 11px;
+  font-size: 10px;
+  font-weight: 600;
 }
 
 .password-dot {
@@ -939,16 +879,16 @@
 
   margin-top: 5px;
 
-  color: #000000;
+  color: #dc2626;
 
   font-size: 9px;
 }
 
 /* =====================================================
-   BOTÓN LOGIN
+   BOTÓN CREAR CUENTA
    ===================================================== */
 
-.login-button {
+.register-button {
   width: 100%;
   height: 50px;
 
@@ -996,11 +936,6 @@
       rgba(249, 115, 22, 0.22);
   }
 
-  &:active:not(:disabled) {
-    transform:
-      translateY(0);
-  }
-
   &:disabled {
     opacity: 0.65;
 
@@ -1010,15 +945,6 @@
 
 .button-arrow {
   font-size: 15px;
-
-  transition:
-    transform 0.2s ease;
-}
-
-.login-button:hover
-.button-arrow {
-  transform:
-    translateX(3px);
 }
 
 /* =====================================================
@@ -1036,8 +962,7 @@
   border-top-color:
     #ffffff;
 
-  border-radius:
-    50%;
+  border-radius: 50%;
 
   animation:
     spin
@@ -1082,10 +1007,10 @@
 }
 
 /* =====================================================
-   REGISTRO
+   BOTÓN LOGIN
    ===================================================== */
 
-.register-button {
+.login-button {
   width: 100%;
   height: 44px;
 
@@ -1182,7 +1107,7 @@
 }
 
 /* =====================================================
-   ANIMACIONES GENERALES
+   ANIMACIONES
    ===================================================== */
 
 @keyframes fadeUp {
@@ -1208,7 +1133,7 @@
 
 @media (max-width: 1150px) {
 
-  .login-page {
+  .register-page {
     grid-template-columns:
       minmax(470px, 1fr)
       minmax(440px, 1fr);
@@ -1232,7 +1157,7 @@
 
 @media (max-width: 900px) {
 
-  .login-page {
+  .register-page {
     display: block;
   }
 
@@ -1273,7 +1198,7 @@
     min-height: auto;
 
     padding:
-      60px 24px;
+      55px 24px;
   }
 }
 
@@ -1287,10 +1212,10 @@
     min-height: 100vh;
 
     padding:
-      34px 20px;
+      32px 20px;
   }
 
-  .login-container {
+  .register-container {
     max-width: 420px;
   }
 
@@ -1298,12 +1223,10 @@
     display: flex;
   }
 
-  .login-header h2 {
+  .register-header h2 {
     font-size: 29px;
   }
 }
-
-/* Respeta usuarios que prefieren menos movimiento */
 
 @media (
 prefers-reduced-motion:

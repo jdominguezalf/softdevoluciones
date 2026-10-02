@@ -1,136 +1,210 @@
-<div class="pagina">
+<section class="return-page">
 
-  <button
-    type="button"
-    class="volver"
-    (click)="volver()"
-  >
-    Volver
-  </button>
+  <div class="page-header">
 
-  @if (cargando()) {
+    <div>
 
-    <div class="mensaje">
-      Cargando compra...
-    </div>
+      <span class="eyebrow">
+        Devoluciones
+      </span>
 
-  } @else if (compra()) {
-
-    <div class="contenedor">
-
-      <h1>
+      <h1 class="page-title">
         Solicitar devolución
       </h1>
 
-      <p>
-        Compra #{{ compra()!.id }}
+      <p class="page-description">
+        Selecciona los productos y completa la información de tu solicitud.
       </p>
 
-      <form
-        [formGroup]="formulario"
-        (ngSubmit)="enviar()"
-      >
+    </div>
 
-        <div class="campo">
+    <button
+      type="button"
+      class="btn btn-secondary"
+      (click)="volver()"
+    >
+      Volver
+    </button>
 
-          <label>
-            Motivo
-          </label>
+  </div>
 
-          <select
-            formControlName="motivo"
-          >
+  @if (error()) {
 
-            <option value="">
-              Selecciona un motivo
-            </option>
+    <div class="alert alert-error">
+      {{ error() }}
+    </div>
 
-            <option value="PRODUCTO_DEFECTUOSO">
-              Producto defectuoso
-            </option>
+  }
 
-            <option value="PRODUCTO_INCORRECTO">
-              Producto incorrecto
-            </option>
+  @if (exito()) {
 
-            <option value="PRODUCTO_DANADO">
-              Producto dañado
-            </option>
+    <div class="alert alert-success">
+      {{ exito() }}
+    </div>
 
-            <option value="NO_CUMPLE_EXPECTATIVAS">
-              No cumple expectativas
-            </option>
+  }
 
-            <option value="OTRO">
-              Otro
-            </option>
+  @if (cargando()) {
 
-          </select>
+    <div class="loading-card">
+      Cargando información de la compra...
+    </div>
+
+  } @else if (compra(); as compraActual) {
+
+    <div class="purchase-reference">
+
+      <div>
+
+        <span class="reference-label">
+          Solicitud asociada a
+        </span>
+
+        <strong>
+          Compra #{{ compraActual.id }}
+        </strong>
+
+      </div>
+
+      <div class="reference-data">
+
+        <div>
+
+          <span>
+            Fecha
+          </span>
+
+          <strong>
+            {{
+              compraActual.fecha
+                | date:'dd/MM/yyyy'
+            }}
+          </strong>
 
         </div>
 
-        <div class="campo">
+        <div>
 
-          <label>
-            Comentario
-          </label>
+          <span>
+            Total
+          </span>
 
-          <textarea
-            formControlName="comentario"
-            rows="4"
-            placeholder="Describe brevemente el motivo de la devolución"
-          ></textarea>
+          <strong>
+            S/
+            {{
+              compraActual.total
+                | number:'1.2-2'
+            }}
+          </strong>
 
         </div>
 
-        <h2>
-          Productos
-        </h2>
+      </div>
+
+    </div>
+
+    <form
+      [formGroup]="formulario"
+      (ngSubmit)="enviarSolicitud()"
+    >
+
+      <section class="form-card">
+
+        <div class="section-title">
+
+          <div class="step">
+            1
+          </div>
+
+          <div>
+
+            <h2>
+              Selecciona los productos
+            </h2>
+
+            <p>
+              Marca únicamente los productos que deseas incluir en la devolución.
+            </p>
+
+          </div>
+
+        </div>
 
         <div
+          class="products-list"
           formArrayName="detalles"
-          class="productos"
         >
 
           @for (
-            detalle of compra()!.detalles;
+            detalle of compraActual.detalles;
             track detalle.id;
             let i = $index
             ) {
 
             <div
-              class="producto"
+              class="product-card"
+              [class.selected]="
+                estaSeleccionado(i)
+              "
               [formGroupName]="i"
             >
 
-              <div class="producto-info">
+              <div class="product-select">
 
-                <input
-                  type="checkbox"
-                  formControlName="seleccionado"
-                >
+                <label class="checkbox">
 
-                <div>
+                  <input
+                    type="checkbox"
+                    formControlName="seleccionado"
+                    (change)="
+                      cambiarSeleccion(i)
+                    "
+                  >
 
-                  <strong>
-                    {{ detalle.productoNombre }}
-                  </strong>
+                  <span></span>
 
-                  <p>
-                    Cantidad comprada:
-                    {{ detalle.cantidad }}
-                  </p>
-
-                  <p>
-                    S/
-                    {{ detalle.precioUnitario | number:'1.2-2' }}
-                  </p>
-
-                </div>
+                </label>
 
               </div>
 
-              <div class="cantidad">
+              <div class="product-icon">
+                P
+              </div>
+
+              <div class="product-info">
+
+                <strong>
+                  {{ detalle.productoNombre }}
+                </strong>
+
+                <span>
+                  Producto #{{ detalle.productoId }}
+                </span>
+
+                <small>
+                  Precio unitario:
+                  S/
+                  {{
+                    detalle.precioUnitario
+                      | number:'1.2-2'
+                  }}
+                </small>
+
+              </div>
+
+              <div class="available">
+
+                <span>
+                  Comprado
+                </span>
+
+                <strong>
+                  {{ detalle.cantidad }}
+                </strong>
+
+              </div>
+
+              <div class="quantity-field">
 
                 <label>
                   Cantidad a devolver
@@ -141,7 +215,15 @@
                   min="1"
                   [max]="detalle.cantidad"
                   formControlName="cantidad"
+                  [disabled]="
+                    !estaSeleccionado(i)
+                  "
                 >
+
+                <small>
+                  Máximo:
+                  {{ detalle.cantidad }}
+                </small>
 
               </div>
 
@@ -151,40 +233,158 @@
 
         </div>
 
-        @if (error()) {
+      </section>
 
-          <div class="error">
-            {{ error() }}
+      <section class="form-card">
+
+        <div class="section-title">
+
+          <div class="step">
+            2
           </div>
 
-        }
+          <div>
 
-        @if (exito()) {
+            <h2>
+              Motivo de la devolución
+            </h2>
 
-          <div class="exito">
-            {{ exito() }}
+            <p>
+              Indica por qué deseas devolver los productos seleccionados.
+            </p>
+
           </div>
 
-        }
+        </div>
+
+        <div class="form-grid">
+
+          <div class="field">
+
+            <label for="motivo">
+              Motivo
+              <span class="required">*</span>
+            </label>
+
+            <select
+              id="motivo"
+              class="form-control"
+              formControlName="motivo"
+            >
+
+              <option value="">
+                Selecciona un motivo
+              </option>
+
+              <option value="PRODUCTO_DEFECTUOSO">
+                Producto defectuoso
+              </option>
+
+              <option value="PRODUCTO_INCORRECTO">
+                Producto incorrecto
+              </option>
+
+              <option value="PRODUCTO_DANADO">
+                Producto dañado
+              </option>
+
+              <option value="NO_CUMPLE_EXPECTATIVAS">
+                No cumple expectativas
+              </option>
+
+              <option value="OTRO">
+                Otro
+              </option>
+
+            </select>
+
+            @if (
+              formulario.controls.motivo.touched
+              &&
+              formulario.controls.motivo.invalid
+              ) {
+
+              <span class="field-error">
+                Selecciona un motivo.
+              </span>
+
+            }
+
+          </div>
+
+          <div class="field full">
+
+            <label for="comentario">
+              Comentario
+            </label>
+
+            <textarea
+              id="comentario"
+              class="form-control textarea"
+              formControlName="comentario"
+              rows="5"
+              placeholder="Agrega información adicional que pueda ayudar a revisar tu solicitud..."
+            ></textarea>
+
+            <span class="field-help">
+              Este campo es opcional.
+            </span>
+
+          </div>
+
+        </div>
+
+      </section>
+
+      <section class="information-card">
+
+        <div class="info-icon">
+          i
+        </div>
+
+        <div>
+
+          <strong>
+            Antes de enviar tu solicitud
+          </strong>
+
+          <p>
+            La solicitud será revisada por un operador. El importe definitivo de devolución será calculado por el sistema según los productos y cantidades aprobados.
+          </p>
+
+        </div>
+
+      </section>
+
+      <div class="form-actions">
+
+        <button
+          type="button"
+          class="btn btn-secondary"
+          (click)="volver()"
+          [disabled]="enviando()"
+        >
+          Cancelar
+        </button>
 
         <button
           type="submit"
-          class="enviar"
+          class="btn btn-primary submit-button"
           [disabled]="enviando()"
         >
 
           @if (enviando()) {
-            Enviando...
+            Enviando solicitud...
           } @else {
-            Registrar devolución
+            Enviar solicitud
           }
 
         </button>
 
-      </form>
+      </div>
 
-    </div>
+    </form>
 
   }
 
-</div>
+</section>

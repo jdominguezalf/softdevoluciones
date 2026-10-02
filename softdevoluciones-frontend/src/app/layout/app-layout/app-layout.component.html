@@ -1,0 +1,142 @@
+<div class="admin-shell">
+
+  <aside class="sidebar">
+
+    <div class="brand">
+
+      <div class="brand-logo">
+        SD
+      </div>
+
+      <div class="brand-copy">
+        <strong>SoftDevoluciones</strong>
+        <span>Management System</span>
+      </div>
+
+    </div>
+
+    <div class="menu-section">
+
+      <span class="menu-label">
+        General
+      </span>
+
+      <nav class="menu">
+
+        @if (esAdmin()) {
+
+          <a
+            routerLink="/admin"
+            routerLinkActive="active"
+            [routerLinkActiveOptions]="{ exact: true }"
+          >
+            <span class="menu-icon">▦</span>
+            <span>Dashboard</span>
+          </a>
+
+        }
+
+        <a
+          routerLink="/admin/devoluciones"
+          routerLinkActive="active"
+        >
+          <span class="menu-icon">↺</span>
+          <span>Devoluciones</span>
+        </a>
+
+        @if (esAdmin()) {
+
+          <a
+            routerLink="/admin/compras"
+            routerLinkActive="active"
+          >
+            <span class="menu-icon">▣</span>
+            <span>Compras</span>
+          </a>
+
+          <a
+            routerLink="/admin/usuarios"
+            routerLinkActive="active"
+          >
+            <span class="menu-icon">♙</span>
+            <span>Usuarios</span>
+          </a>
+
+        }
+
+      </nav>
+
+    </div>
+
+    <div class="sidebar-bottom">
+
+      <div class="profile-card">
+
+        <div class="profile-avatar">
+          {{
+            usuario?.nombre?.charAt(0)
+            || 'U'
+          }}
+        </div>
+
+        <div class="profile-info">
+
+          <strong>
+            {{ usuario?.nombre }}
+          </strong>
+
+          <span>
+            {{ usuario?.rol }}
+          </span>
+
+        </div>
+
+      </div>
+
+      <button
+        type="button"
+        class="logout-button"
+        (click)="cerrarSesion()"
+      >
+        Cerrar sesión
+      </button>
+
+    </div>
+
+  </aside>
+
+  <div class="workspace">
+
+    <header class="topbar">
+
+      <div>
+
+        <span class="topbar-eyebrow">
+          SoftDevoluciones
+        </span>
+
+        <strong class="topbar-title">
+          Gestión administrativa
+        </strong>
+
+      </div>
+
+      <div class="topbar-user">
+
+        <div class="status-dot"></div>
+
+        <span>
+          Sesión activa
+        </span>
+
+      </div>
+
+    </header>
+
+    <main class="content">
+      <router-outlet></router-outlet>
+    </main>
+
+  </div>
+
+</div>

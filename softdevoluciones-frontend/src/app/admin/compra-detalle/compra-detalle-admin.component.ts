@@ -14,7 +14,9 @@ import { CompraService } from '../../core/services/compra.service';
 })
 export class CompraDetalleAdminComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
+
   private readonly router = inject(Router);
+
   private readonly compraService = inject(CompraService);
 
   compra = signal<Compra | null>(null);
@@ -23,28 +25,34 @@ export class CompraDetalleAdminComponent implements OnInit {
   error = signal('');
 
   ngOnInit(): void {
-    this.cargarCompra();
-  }
-
-  cargarCompra(): void {
     const id = Number(this.route.snapshot.paramMap.get('id'));
 
     if (!id) {
-      this.error.set('Compra no válida');
+      this.error.set('No se encontró el identificador de la compra');
+
       this.cargando.set(false);
+
       return;
     }
+
+    this.cargarCompra(id);
+  }
+
+  cargarCompra(id: number): void {
+    this.cargando.set(true);
+    this.error.set('');
 
     this.compraService.obtenerCompraAdmin(id).subscribe({
       next: (response) => {
         this.compra.set(response);
+
         this.cargando.set(false);
       },
 
       error: (err) => {
         this.cargando.set(false);
 
-        this.error.set(err?.error?.mensaje ?? 'No se pudo cargar la compra');
+        this.error.set(err?.error?.mensaje ?? 'No se pudo cargar el detalle de la compra');
       },
     });
   }
@@ -53,4 +61,7 @@ export class CompraDetalleAdminComponent implements OnInit {
     this.router.navigate(['/admin/compras']);
   }
 
+  irDevoluciones(): void {
+    this.router.navigate(['/admin/devoluciones']);
+  }
 }

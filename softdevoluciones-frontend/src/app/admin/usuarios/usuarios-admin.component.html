@@ -1,26 +1,28 @@
-<div class="pagina">
+<section class="usuarios-page">
 
-  <header class="encabezado">
+  <div class="page-header">
 
     <div>
-      <h1>Usuarios</h1>
 
-      <p>
-        Consulta los usuarios registrados en el sistema.
+      <span class="eyebrow">
+        Administración
+      </span>
+
+      <h1 class="page-title">
+        Usuarios
+      </h1>
+
+      <p class="page-description">
+        Consulta las cuentas registradas y los roles asignados.
       </p>
+
     </div>
 
-    <div class="navegacion">
+    <div class="header-actions">
 
       <button
         type="button"
-        (click)="irPanel()"
-      >
-        Volver al panel
-      </button>
-
-      <button
-        type="button"
+        class="btn btn-secondary"
         (click)="irCompras()"
       >
         Compras
@@ -28,6 +30,7 @@
 
       <button
         type="button"
+        class="btn btn-primary"
         (click)="irDevoluciones()"
       >
         Devoluciones
@@ -35,78 +38,235 @@
 
     </div>
 
-  </header>
+  </div>
+
+  @if (error()) {
+
+    <div class="alert alert-error">
+      {{ error() }}
+    </div>
+
+  }
 
   @if (cargando()) {
 
-    <div class="mensaje">
+    <div class="loading-box">
       Cargando usuarios...
-    </div>
-
-  } @else if (error()) {
-
-    <div class="error">
-      {{ error() }}
     </div>
 
   } @else {
 
-    <div class="tabla-contenedor">
+    <div class="summary-grid">
 
-      <table>
+      <article class="summary-card">
 
-        <thead>
-        <tr>
-          <th>ID</th>
-          <th>Nombre</th>
-          <th>Correo</th>
-          <th>Rol</th>
-        </tr>
-        </thead>
+        <span class="summary-label">
+          Total usuarios
+        </span>
 
-        <tbody>
+        <strong class="summary-value">
+          {{ usuarios().length }}
+        </strong>
 
-          @for (
-            usuario of usuarios();
-            track usuario.id
-            ) {
+        <span class="summary-description">
+          Cuentas registradas
+        </span>
 
-            <tr>
+      </article>
 
-              <td>
-                {{ usuario.id }}
-              </td>
+      <article class="summary-card">
 
-              <td>
-                {{ usuario.nombre }}
-              </td>
+        <span class="summary-label">
+          Clientes
+        </span>
 
-              <td>
-                {{ usuario.email }}
-              </td>
+        <strong class="summary-value">
+          {{ cantidadPorRol('CLIENTE') }}
+        </strong>
 
-              <td>
-                {{ usuario.rol }}
-              </td>
+        <span class="summary-description">
+          Usuarios con acceso cliente
+        </span>
 
-            </tr>
+      </article>
 
-          } @empty {
+      <article class="summary-card">
 
-            <tr>
-              <td colspan="4">
-                No existen usuarios registrados.
-              </td>
-            </tr>
+        <span class="summary-label">
+          Operadores
+        </span>
 
-          }
+        <strong class="summary-value">
+          {{ cantidadPorRol('OPERADOR') }}
+        </strong>
 
-        </tbody>
+        <span class="summary-description">
+          Responsables de devoluciones
+        </span>
 
-      </table>
+      </article>
+
+      <article class="summary-card">
+
+        <span class="summary-label">
+          Administradores
+        </span>
+
+        <strong class="summary-value">
+          {{ cantidadPorRol('ADMIN') }}
+        </strong>
+
+        <span class="summary-description">
+          Acceso administrativo
+        </span>
+
+      </article>
+
+    </div>
+
+    <div class="table-card">
+
+      <div class="table-header">
+
+        <div>
+
+          <h2>
+            Usuarios registrados
+          </h2>
+
+          <p>
+            Información general de las cuentas del sistema.
+          </p>
+
+        </div>
+
+        <span class="results-badge">
+          {{ usuarios().length }} usuarios
+        </span>
+
+      </div>
+
+      <div class="table-responsive">
+
+        <table>
+
+          <thead>
+
+          <tr>
+            <th>ID</th>
+            <th>Usuario</th>
+            <th>Correo</th>
+            <th>Rol</th>
+          </tr>
+
+          </thead>
+
+          <tbody>
+
+            @for (
+              usuario of usuarios();
+              track usuario.id
+              ) {
+
+              <tr>
+
+                <td>
+                  <span class="id-cell">
+                    #{{ usuario.id }}
+                  </span>
+                </td>
+
+                <td>
+
+                  <div class="user-cell">
+
+                    <div class="user-avatar">
+                      {{
+                        usuario.nombre
+                          .charAt(0)
+                          .toUpperCase()
+                      }}
+                    </div>
+
+                    <div class="user-info">
+
+                      <strong>
+                        {{ usuario.nombre }}
+                      </strong>
+
+                      <span>
+                        Usuario del sistema
+                      </span>
+
+                    </div>
+
+                  </div>
+
+                </td>
+
+                <td>
+                  <span class="email">
+                    {{ usuario.email }}
+                  </span>
+                </td>
+
+                <td>
+
+                  @switch (usuario.rol) {
+
+                    @case ('ADMIN') {
+
+                      <span class="role-badge role-admin">
+                        Administrador
+                      </span>
+
+                    }
+
+                    @case ('OPERADOR') {
+
+                      <span class="role-badge role-operator">
+                        Operador
+                      </span>
+
+                    }
+
+                    @case ('CLIENTE') {
+
+                      <span class="role-badge role-client">
+                        Cliente
+                      </span>
+
+                    }
+
+                  }
+
+                </td>
+
+              </tr>
+
+            } @empty {
+
+              <tr>
+
+                <td
+                  colspan="4"
+                  class="empty-state"
+                >
+                  No existen usuarios registrados.
+                </td>
+
+              </tr>
+
+            }
+
+          </tbody>
+
+        </table>
+
+      </div>
 
     </div>
 
   }
 
-</div>
+</section>

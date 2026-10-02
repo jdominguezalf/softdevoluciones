@@ -1,71 +1,259 @@
-<div class="pagina">
+<section class="dashboard">
 
-  <header class="encabezado">
+  <div class="page-header">
 
     <div>
-      <h1>Panel de administración</h1>
-      <p>
-        Gestiona las principales funciones del sistema.
+
+      <span class="eyebrow">
+        Administración
+      </span>
+
+      <h1 class="page-title">
+        Panel de administración
+      </h1>
+
+      <p class="page-description">
+        Resumen general de la gestión de devoluciones.
       </p>
+
     </div>
 
-    <button
-      type="button"
-      class="cerrar"
-      (click)="cerrarSesion()"
-    >
-      Cerrar sesión
-    </button>
+    <div class="welcome">
 
-  </header>
+      <span>
+        Bienvenido
+      </span>
 
-  <section class="opciones">
+      <strong>
+        {{ usuario?.nombre }}
+      </strong>
 
-    <article
-      class="tarjeta"
-      (click)="irDevoluciones()"
-    >
-      <h2>Devoluciones</h2>
+    </div>
 
-      <p>
-        Revisar solicitudes, aplicar filtros y gestionar estados.
-      </p>
+  </div>
 
-      <button type="button">
-        Gestionar devoluciones
-      </button>
-    </article>
+  @if (error()) {
 
-    <article
-      class="tarjeta"
-      (click)="irCompras()"
-    >
-      <h2>Compras</h2>
+    <div class="alert alert-error">
+      {{ error() }}
+    </div>
 
-      <p>
-        Consultar las compras registradas y sus detalles.
-      </p>
+  }
 
-      <button type="button">
-        Ver compras
-      </button>
-    </article>
+  @if (cargando()) {
 
-    <article
-      class="tarjeta"
-      (click)="irUsuarios()"
-    >
-      <h2>Usuarios</h2>
+    <div class="loading-grid">
 
-      <p>
-        Consultar los usuarios registrados y sus roles.
-      </p>
+      <div class="loading-card"></div>
+      <div class="loading-card"></div>
+      <div class="loading-card"></div>
+      <div class="loading-card"></div>
 
-      <button type="button">
-        Ver usuarios
-      </button>
-    </article>
+    </div>
+
+  } @else {
+
+    <section class="stats-grid">
+
+      <article class="stat-card">
+
+        <div class="stat-header">
+
+          <span class="stat-label">
+            Total devoluciones
+          </span>
+
+          <div class="stat-icon orange">
+            R
+          </div>
+
+        </div>
+
+        <strong class="stat-value">
+          {{ totalDevoluciones() }}
+        </strong>
+
+        <span class="stat-description">
+          Solicitudes registradas
+        </span>
+
+      </article>
+
+      <article class="stat-card">
+
+        <div class="stat-header">
+
+          <span class="stat-label">
+            En revisión
+          </span>
+
+          <div class="stat-icon blue">
+            V
+          </div>
+
+        </div>
+
+        <strong class="stat-value">
+          {{ enRevision() }}
+        </strong>
+
+        <span class="stat-description">
+          Solicitudes pendientes de decisión
+        </span>
+
+      </article>
+
+      <article class="stat-card">
+
+        <div class="stat-header">
+
+          <span class="stat-label">
+            Aprobadas
+          </span>
+
+          <div class="stat-icon green">
+            A
+          </div>
+
+        </div>
+
+        <strong class="stat-value">
+          {{ aprobadas() }}
+        </strong>
+
+        <span class="stat-description">
+          Pendientes de completar
+        </span>
+
+      </article>
+
+      <article class="stat-card">
+
+        <div class="stat-header">
+
+          <span class="stat-label">
+            Rechazadas
+          </span>
+
+          <div class="stat-icon red">
+            X
+          </div>
+
+        </div>
+
+        <strong class="stat-value">
+          {{ rechazadas() }}
+        </strong>
+
+        <span class="stat-description">
+          Solicitudes no aprobadas
+        </span>
+
+      </article>
+
+    </section>
+
+  }
+
+  <section class="dashboard-section">
+
+    <div class="section-header">
+
+      <div>
+        <h2>Accesos rápidos</h2>
+
+        <p>
+          Gestiona las principales áreas del sistema.
+        </p>
+      </div>
+
+    </div>
+
+    <div class="quick-grid">
+
+      <article
+        class="quick-card"
+        (click)="irDevoluciones()"
+      >
+
+        <div class="quick-icon">
+          ↺
+        </div>
+
+        <div class="quick-content">
+
+          <h3>
+            Gestión de devoluciones
+          </h3>
+
+          <p>
+            Revisa solicitudes, aplica filtros y administra el flujo de estados.
+          </p>
+
+          <span>
+            Ir a devoluciones →
+          </span>
+
+        </div>
+
+      </article>
+
+      <article
+        class="quick-card"
+        (click)="irCompras()"
+      >
+
+        <div class="quick-icon">
+          ▣
+        </div>
+
+        <div class="quick-content">
+
+          <h3>
+            Compras registradas
+          </h3>
+
+          <p>
+            Consulta todas las compras disponibles y revisa sus productos.
+          </p>
+
+          <span>
+            Ver compras →
+          </span>
+
+        </div>
+
+      </article>
+
+      <article
+        class="quick-card"
+        (click)="irUsuarios()"
+      >
+
+        <div class="quick-icon">
+          U
+        </div>
+
+        <div class="quick-content">
+
+          <h3>
+            Usuarios
+          </h3>
+
+          <p>
+            Consulta las cuentas registradas y los roles asignados.
+          </p>
+
+          <span>
+            Ver usuarios →
+          </span>
+
+        </div>
+
+      </article>
+
+    </div>
 
   </section>
 
-</div>
+</section>

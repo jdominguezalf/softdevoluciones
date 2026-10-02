@@ -1,0 +1,288 @@
+<section class="detalle-page">
+
+  <div class="page-header">
+
+    <div>
+
+      <span class="eyebrow">
+        Mis devoluciones
+      </span>
+
+      <h1 class="page-title">
+        Detalle de solicitud
+      </h1>
+
+      <p class="page-description">
+        Consulta la información completa de tu devolución.
+      </p>
+
+    </div>
+
+    <button
+      type="button"
+      class="btn btn-secondary"
+      (click)="volver()"
+    >
+      Volver
+    </button>
+
+  </div>
+
+  @if (error()) {
+
+    <div class="alert alert-error">
+      {{ error() }}
+    </div>
+
+  }
+
+  @if (cargando()) {
+
+    <div class="loading-card">
+      Cargando información...
+    </div>
+
+  } @else if (devolucion(); as devolucionActual) {
+
+    <section class="summary-card">
+
+      <div class="summary-top">
+
+        <div>
+
+          <span class="request-label">
+            Solicitud
+          </span>
+
+          <h2>
+            #{{ devolucionActual.id }}
+          </h2>
+
+          <p>
+            Registrada el
+            {{
+              devolucionActual.fechaSolicitud
+                | date:'dd/MM/yyyy HH:mm'
+            }}
+          </p>
+
+        </div>
+
+        @switch (devolucionActual.estado) {
+
+          @case ('SOLICITADA') {
+            <span class="badge badge-warning">
+              Solicitada
+            </span>
+          }
+
+          @case ('EN_REVISION') {
+            <span class="badge badge-info">
+              En revisión
+            </span>
+          }
+
+          @case ('APROBADA') {
+            <span class="badge badge-success">
+              Aprobada
+            </span>
+          }
+
+          @case ('RECHAZADA') {
+            <span class="badge badge-danger">
+              Rechazada
+            </span>
+          }
+
+          @case ('COMPLETADA') {
+            <span class="badge badge-neutral">
+              Completada
+            </span>
+          }
+
+        }
+
+      </div>
+
+      <div class="summary-grid">
+
+        <div>
+
+          <span>
+            Compra
+          </span>
+
+          <strong>
+            #{{ devolucionActual.compraId }}
+          </strong>
+
+        </div>
+
+        <div>
+
+          <span>
+            Motivo
+          </span>
+
+          <strong>
+            {{ motivoTexto(devolucionActual.motivo) }}
+          </strong>
+
+        </div>
+
+        <div>
+
+          <span>
+            Importe
+          </span>
+
+          <strong class="amount">
+            S/
+            {{
+              devolucionActual.importe
+                | number:'1.2-2'
+            }}
+          </strong>
+
+        </div>
+
+      </div>
+
+    </section>
+
+    <section class="detail-card">
+
+      <div class="section-title">
+
+        <h2>
+          Productos incluidos
+        </h2>
+
+        <p>
+          Productos asociados a esta solicitud de devolución.
+        </p>
+
+      </div>
+
+      <div class="products-list">
+
+        @for (
+          detalle of devolucionActual.detalles;
+          track detalle.id
+          ) {
+
+          <article class="product-row">
+
+            <div class="product-main">
+
+              <div class="product-icon">
+                P
+              </div>
+
+              <div>
+
+                <strong>
+                  {{ detalle.productoNombre }}
+                </strong>
+
+                <span>
+                  Producto de la compra
+                </span>
+
+              </div>
+
+            </div>
+
+            <div class="product-data">
+
+              <div>
+
+                <span>
+                  Cantidad
+                </span>
+
+                <strong>
+                  {{ detalle.cantidad }}
+                </strong>
+
+              </div>
+
+              <div>
+
+                <span>
+                  Importe
+                </span>
+
+                <strong>
+                  S/
+                  {{
+                    detalle.importe
+                      | number:'1.2-2'
+                  }}
+                </strong>
+
+              </div>
+
+            </div>
+
+          </article>
+
+        }
+
+      </div>
+
+    </section>
+
+    <section class="detail-card">
+
+      <div class="section-title">
+
+        <h2>
+          Información de la solicitud
+        </h2>
+
+        <p>
+          Comentarios y observaciones registradas.
+        </p>
+
+      </div>
+
+      <div class="text-grid">
+
+        <div class="text-box">
+
+          <span>
+            Comentario del cliente
+          </span>
+
+          <p>
+            {{
+              devolucionActual.comentario
+              || 'No se agregó ningún comentario.'
+            }}
+          </p>
+
+        </div>
+
+        <div class="text-box">
+
+          <span>
+            Observación del operador
+          </span>
+
+          <p>
+            {{
+              devolucionActual.observacionOperador
+              || 'Aún no existen observaciones.'
+            }}
+          </p>
+
+        </div>
+
+      </div>
+
+    </section>
+
+  }
+
+</section>

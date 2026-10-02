@@ -1,109 +1,263 @@
-<div class="pagina">
+<section class="compras-page">
 
-  <header class="encabezado">
+  <div class="page-header">
 
     <div>
-      <h1>Mis compras</h1>
-      <p>Consulta las compras asociadas a tu cuenta.</p>
-    </div>
 
-    <div class="acciones">
+      <span class="eyebrow">
+        Mi cuenta
+      </span>
 
-      <button
-        type="button"
-        class="devoluciones"
-        (click)="verMisDevoluciones()"
-      >
-        Mis devoluciones
-      </button>
+      <h1 class="page-title">
+        Mis compras
+      </h1>
 
-      <button
-        class="cerrar"
-        type="button"
-        (click)="cerrarSesion()"
-      >
-        Cerrar sesión
-      </button>
+      <p class="page-description">
+        Consulta tus compras y solicita una devolución cuando sea necesario.
+      </p>
 
     </div>
 
-  </header>
+    <button
+      type="button"
+      class="btn btn-secondary"
+      (click)="verMisDevoluciones()"
+    >
+      Ver mis devoluciones
+    </button>
 
-  @if (cargando()) {
+  </div>
 
-    <div class="mensaje">
-      Cargando compras...
-    </div>
+  @if (error()) {
 
-  } @else if (error()) {
-
-    <div class="error">
+    <div class="alert alert-error">
       {{ error() }}
-    </div>
-
-  } @else if (compras().length === 0) {
-
-    <div class="mensaje">
-      No tienes compras registradas.
-    </div>
-
-  } @else {
-
-    <div class="tabla-contenedor">
-
-      <table>
-
-        <thead>
-        <tr>
-          <th>ID</th>
-          <th>Fecha</th>
-          <th>Estado</th>
-          <th>Total</th>
-          <th>Acciones</th>
-        </tr>
-        </thead>
-
-        <tbody>
-
-          @for (compra of compras(); track compra.id) {
-
-            <tr>
-
-              <td>
-                {{ compra.id }}
-              </td>
-
-              <td>
-                {{ compra.fecha | date:'dd/MM/yyyy HH:mm' }}
-              </td>
-
-              <td>
-                {{ compra.estado }}
-              </td>
-
-              <td>
-                S/ {{ compra.total | number:'1.2-2' }}
-              </td>
-
-              <td>
-                <button
-                  type="button"
-                  (click)="verDetalle(compra.id)"
-                >
-                  Ver detalle
-                </button>
-              </td>
-
-            </tr>
-
-          }
-
-        </tbody>
-
-      </table>
-
     </div>
 
   }
 
-</div>
+  @if (cargando()) {
+
+    <div class="loading-grid">
+
+      <div class="loading-card"></div>
+      <div class="loading-card"></div>
+      <div class="loading-card"></div>
+
+    </div>
+
+  } @else {
+
+    <section class="summary-grid">
+
+      <article class="summary-card">
+
+        <span class="summary-label">
+          Total de compras
+        </span>
+
+        <strong class="summary-value">
+          {{ compras().length }}
+        </strong>
+
+        <span class="summary-description">
+          Compras registradas en tu cuenta
+        </span>
+
+      </article>
+
+      <article class="summary-card">
+
+        <span class="summary-label">
+          Compras entregadas
+        </span>
+
+        <strong class="summary-value">
+          {{ cantidadEntregadas() }}
+        </strong>
+
+        <span class="summary-description">
+          Disponibles para revisar
+        </span>
+
+      </article>
+
+      <article class="summary-card destacado">
+
+        <span class="summary-label">
+          Importe acumulado
+        </span>
+
+        <strong class="summary-value amount">
+          S/
+          {{
+            totalGastado()
+              | number:'1.2-2'
+          }}
+        </strong>
+
+        <span class="summary-description">
+          Total registrado en tus compras
+        </span>
+
+      </article>
+
+    </section>
+
+    @if (compras().length === 0) {
+
+      <div class="empty-card">
+
+        <div class="empty-icon">
+          C
+        </div>
+
+        <h2>
+          Aún no tienes compras registradas
+        </h2>
+
+        <p>
+          Cuando existan compras asociadas a tu cuenta aparecerán en esta sección.
+        </p>
+
+      </div>
+
+    } @else {
+
+      <section class="purchase-section">
+
+        <div class="section-header">
+
+          <div>
+
+            <h2>
+              Historial de compras
+            </h2>
+
+            <p>
+              Selecciona una compra para consultar sus productos y opciones disponibles.
+            </p>
+
+          </div>
+
+          <span class="results-badge">
+            {{ compras().length }}
+            compras
+          </span>
+
+        </div>
+
+        <div class="purchases-grid">
+
+          @for (
+            compra of compras();
+            track compra.id
+            ) {
+
+            <article class="purchase-card">
+
+              <div class="purchase-header">
+
+                <div>
+
+                  <span class="purchase-label">
+                    Compra
+                  </span>
+
+                  <strong class="purchase-id">
+                    #{{ compra.id }}
+                  </strong>
+
+                </div>
+
+                @if (
+                  compra.estado === 'ENTREGADA'
+                  ) {
+
+                  <span class="badge badge-success">
+                    Entregada
+                  </span>
+
+                } @else {
+
+                  <span class="badge badge-info">
+                    En tránsito
+                  </span>
+
+                }
+
+              </div>
+
+              <div class="purchase-details">
+
+                <div class="detail-row">
+
+                  <span>
+                    Fecha
+                  </span>
+
+                  <strong>
+                    {{
+                      compra.fecha
+                        | date:'dd/MM/yyyy'
+                    }}
+                  </strong>
+
+                </div>
+
+                <div class="detail-row">
+
+                  <span>
+                    Productos
+                  </span>
+
+                  <strong>
+                    {{ compra.detalles.length }}
+                  </strong>
+
+                </div>
+
+                <div class="detail-row total-row">
+
+                  <span>
+                    Total
+                  </span>
+
+                  <strong>
+                    S/
+                    {{
+                      compra.total
+                        | number:'1.2-2'
+                    }}
+                  </strong>
+
+                </div>
+
+              </div>
+
+              <div class="purchase-footer">
+
+                <button
+                  type="button"
+                  class="detail-button"
+                  (click)="verDetalle(compra.id)"
+                >
+                  Ver detalle
+                  <span>→</span>
+                </button>
+
+              </div>
+
+            </article>
+
+          }
+
+        </div>
+
+      </section>
+
+    }
+
+  }
+
+</section>

@@ -1,127 +1,422 @@
-<div class="pagina">
+<section class="returns-page">
 
-  <header class="encabezado">
+  <div class="page-header">
 
     <div>
-      <h1>Mis devoluciones</h1>
-      <p>
-        Consulta el estado de tus solicitudes.
+
+      <span class="eyebrow">
+        Mi cuenta
+      </span>
+
+      <h1 class="page-title">
+        Mis devoluciones
+      </h1>
+
+      <p class="page-description">
+        Consulta el estado y seguimiento de tus solicitudes.
       </p>
+
     </div>
 
     <button
       type="button"
+      class="btn btn-secondary"
       (click)="volverCompras()"
     >
-      Mis compras
+      Volver a mis compras
     </button>
 
-  </header>
+  </div>
 
-  @if (cargando()) {
+  @if (error()) {
 
-    <div class="mensaje">
-      Cargando devoluciones...
-    </div>
-
-  } @else if (error()) {
-
-    <div class="error">
+    <div class="alert alert-error">
       {{ error() }}
     </div>
 
-  } @else if (devoluciones().length === 0) {
+  }
 
-    <div class="mensaje">
-      No tienes solicitudes de devolución.
+  @if (cargando()) {
+
+    <div class="loading-grid">
+
+      <div class="loading-card"></div>
+      <div class="loading-card"></div>
+      <div class="loading-card"></div>
+
     </div>
 
   } @else {
 
-    <div class="tabla-contenedor">
+    <section class="summary-grid">
 
-      <table>
+      <article class="summary-card">
 
-        <thead>
-        <tr>
-          <th>ID</th>
-          <th>Compra</th>
-          <th>Fecha</th>
-          <th>Motivo</th>
-          <th>Estado</th>
-          <th>Importe</th>
-        </tr>
-        </thead>
+        <span class="summary-label">
+          Total solicitudes
+        </span>
 
-        <tbody>
+        <strong class="summary-value">
+          {{ devoluciones().length }}
+        </strong>
+
+        <span class="summary-description">
+          Solicitudes registradas
+        </span>
+
+      </article>
+
+      <article class="summary-card">
+
+        <span class="summary-label">
+          En revisión
+        </span>
+
+        <strong class="summary-value blue">
+          {{ cantidadPorEstado('EN_REVISION') }}
+        </strong>
+
+        <span class="summary-description">
+          Actualmente en evaluación
+        </span>
+
+      </article>
+
+      <article class="summary-card">
+
+        <span class="summary-label">
+          Aprobadas
+        </span>
+
+        <strong class="summary-value green">
+          {{ cantidadPorEstado('APROBADA') }}
+        </strong>
+
+        <span class="summary-description">
+          Pendientes de completar
+        </span>
+
+      </article>
+
+      <article class="summary-card">
+
+        <span class="summary-label">
+          Completadas
+        </span>
+
+        <strong class="summary-value">
+          {{ cantidadPorEstado('COMPLETADA') }}
+        </strong>
+
+        <span class="summary-description">
+          Procesos finalizados
+        </span>
+
+      </article>
+
+    </section>
+
+    @if (devoluciones().length === 0) {
+
+      <div class="empty-card">
+
+        <div class="empty-icon">
+          ↺
+        </div>
+
+        <h2>
+          Aún no tienes devoluciones
+        </h2>
+
+        <p>
+          Cuando registres una solicitud podrás consultar aquí su estado y seguimiento.
+        </p>
+
+        <button
+          type="button"
+          class="btn btn-primary"
+          (click)="volverCompras()"
+        >
+          Ver mis compras
+        </button>
+
+      </div>
+
+    } @else {
+
+      <section class="returns-section">
+
+        <div class="section-header">
+
+          <div>
+
+            <h2>
+              Historial de solicitudes
+            </h2>
+
+            <p>
+              Revisa la información principal de cada devolución.
+            </p>
+
+          </div>
+
+          <span class="results-badge">
+            {{ devoluciones().length }}
+            solicitudes
+          </span>
+
+        </div>
+
+        <div class="returns-list">
 
           @for (
             devolucion of devoluciones();
             track devolucion.id
             ) {
 
-            <tr>
+            <article class="return-card">
 
-              <td>
-                {{ devolucion.id }}
-              </td>
+              <div class="return-main">
 
-              <td>
-                #{{ devolucion.compraId }}
-              </td>
+                <div class="return-title">
 
-              <td>
-                {{
-                  devolucion.fechaSolicitud
-                    | date:'dd/MM/yyyy HH:mm'
-                }}
-              </td>
+                  <span class="return-label">
+                    Solicitud
+                  </span>
 
-              <td>
-                {{ devolucion.motivo }}
-              </td>
+                  <strong>
+                    #{{ devolucion.id }}
+                  </strong>
 
-              <td>
-                <span
-                  class="estado"
-                  [class.solicitada]="
-                    devolucion.estado === 'SOLICITADA'
-                  "
-                  [class.revision]="
-                    devolucion.estado === 'EN_REVISION'
-                  "
-                  [class.aprobada]="
-                    devolucion.estado === 'APROBADA'
-                  "
-                  [class.rechazada]="
-                    devolucion.estado === 'RECHAZADA'
-                  "
-                  [class.completada]="
-                    devolucion.estado === 'COMPLETADA'
-                  "
-                >
-                  {{ devolucion.estado }}
+                </div>
+
+                @switch (devolucion.estado) {
+
+                  @case ('SOLICITADA') {
+
+                    <span class="badge badge-warning">
+                      Solicitada
+                    </span>
+
+                  }
+
+                  @case ('EN_REVISION') {
+
+                    <span class="badge badge-info">
+                      En revisión
+                    </span>
+
+                  }
+
+                  @case ('APROBADA') {
+
+                    <span class="badge badge-success">
+                      Aprobada
+                    </span>
+
+                  }
+
+                  @case ('RECHAZADA') {
+
+                    <span class="badge badge-danger">
+                      Rechazada
+                    </span>
+
+                  }
+
+                  @case ('COMPLETADA') {
+
+                    <span class="badge badge-neutral">
+                      Completada
+                    </span>
+
+                  }
+
+                }
+
+              </div>
+
+              <div class="return-info-grid">
+
+                <div>
+
+                  <span>
+                    Compra
+                  </span>
+
+                  <strong>
+                    #{{ devolucion.compraId }}
+                  </strong>
+
+                </div>
+
+                <div>
+
+                  <span>
+                    Fecha
+                  </span>
+
+                  <strong>
+                    {{
+                      devolucion.fechaSolicitud
+                        | date:'dd/MM/yyyy'
+                    }}
+                  </strong>
+
+                </div>
+
+                <div>
+
+                  <span>
+                    Motivo
+                  </span>
+
+                  <strong>
+                    {{ motivoTexto(devolucion.motivo) }}
+                  </strong>
+
+                </div>
+
+                <div>
+
+                  <span>
+                    Importe
+                  </span>
+
+                  <strong class="amount">
+                    S/
+                    {{
+                      devolucion.importe
+                        | number:'1.2-2'
+                    }}
+                  </strong>
+
+                </div>
+
+              </div>
+
+              <div class="status-progress">
+
+                <div class="progress-line">
+
+                  <div
+                    class="progress-step"
+                    [class.active]="
+                      devolucion.estado === 'SOLICITADA'
+                      ||
+                      devolucion.estado === 'EN_REVISION'
+                      ||
+                      devolucion.estado === 'APROBADA'
+                      ||
+                      devolucion.estado === 'COMPLETADA'
+                    "
+                  >
+                    <span></span>
+                    <small>Solicitada</small>
+                  </div>
+
+                  <div
+                    class="progress-step"
+                    [class.active]="
+                      devolucion.estado === 'EN_REVISION'
+                      ||
+                      devolucion.estado === 'APROBADA'
+                      ||
+                      devolucion.estado === 'COMPLETADA'
+                    "
+                  >
+                    <span></span>
+                    <small>En revisión</small>
+                  </div>
+
+                  <div
+                    class="progress-step"
+                    [class.active]="
+                      devolucion.estado === 'APROBADA'
+                      ||
+                      devolucion.estado === 'COMPLETADA'
+                    "
+                    [class.rejected]="
+                      devolucion.estado === 'RECHAZADA'
+                    "
+                  >
+                    <span></span>
+
+                    @if (
+                      devolucion.estado === 'RECHAZADA'
+                      ) {
+                      <small>Rechazada</small>
+                    } @else {
+                      <small>Aprobada</small>
+                    }
+
+                  </div>
+
+                  <div
+                    class="progress-step"
+                    [class.active]="
+                      devolucion.estado === 'COMPLETADA'
+                    "
+                  >
+                    <span></span>
+                    <small>Completada</small>
+                  </div>
+
+                </div>
+
+              </div>
+
+              <div class="return-footer">
+
+                <span class="status-description">
+
+                  @switch (devolucion.estado) {
+
+                    @case ('SOLICITADA') {
+                      Tu solicitud fue registrada correctamente.
+                    }
+
+                    @case ('EN_REVISION') {
+                      La solicitud está siendo revisada.
+                    }
+
+                    @case ('APROBADA') {
+                      La devolución fue aprobada.
+                    }
+
+                    @case ('RECHAZADA') {
+                      La solicitud no fue aprobada.
+                    }
+
+                    @case ('COMPLETADA') {
+                      El proceso de devolución finalizó.
+                    }
+
+                  }
+
                 </span>
-              </td>
 
-              <td>
-                S/
-                {{
-                  devolucion.importe
-                    | number:'1.2-2'
-                }}
-              </td>
+                <button
+                  type="button"
+                  class="detail-button"
+                  (click)="verDetalle(devolucion.id)"
+                >
+                  Ver detalle
+                  <span>→</span>
+                </button>
 
-            </tr>
+              </div>
+
+            </article>
 
           }
 
-        </tbody>
+        </div>
 
-      </table>
+      </section>
 
-    </div>
+    }
 
   }
 
-</div>
+</section>

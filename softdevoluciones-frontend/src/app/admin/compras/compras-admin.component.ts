@@ -1,10 +1,5 @@
 import { CommonModule } from '@angular/common';
-import {
-  Component,
-  OnInit,
-  inject,
-  signal
-} from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 
 import { Compra } from '../../core/models/compra.model';
@@ -23,7 +18,6 @@ export class ComprasAdminComponent implements OnInit {
   private readonly router = inject(Router);
 
   compras = signal<Compra[]>([]);
-
   cargando = signal(true);
   error = signal('');
 
@@ -53,14 +47,11 @@ export class ComprasAdminComponent implements OnInit {
     this.router.navigate(['/admin/compras', id]);
   }
 
-  irDevoluciones(): void {
-    this.router.navigate(['/admin/devoluciones']);
-  }
-
   irUsuarios(): void {
     this.router.navigate(['/admin/usuarios']);
   }
-  irPanel(): void {
-    this.router.navigate(['/admin']);
+
+  irDevoluciones(): void {
+    this.router.navigate(['/admin/devoluciones']);
   }
 }

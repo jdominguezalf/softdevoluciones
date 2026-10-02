@@ -1,120 +1,285 @@
-<div class="pagina">
+<section class="detalle-page">
 
-  <button
-    type="button"
-    class="volver"
-    (click)="volver()"
-  >
-    Volver a compras
-  </button>
+  <div class="page-header">
 
-  @if (cargando()) {
+    <div>
 
-    <div class="mensaje">
-      Cargando compra...
+      <span class="eyebrow">
+        Compras
+      </span>
+
+      <h1 class="page-title">
+        Detalle de compra
+      </h1>
+
+      <p class="page-description">
+        Consulta la información y los productos asociados a la compra.
+      </p>
+
     </div>
 
-  } @else if (error()) {
+    <div class="header-actions">
 
-    <div class="error">
+      <button
+        type="button"
+        class="btn btn-secondary"
+        (click)="volver()"
+      >
+        Volver
+      </button>
+
+      <button
+        type="button"
+        class="btn btn-primary"
+        (click)="irDevoluciones()"
+      >
+        Ver devoluciones
+      </button>
+
+    </div>
+
+  </div>
+
+  @if (error()) {
+
+    <div class="alert alert-error">
       {{ error() }}
-    </div>
-
-  } @else if (compra()) {
-
-    <div class="encabezado">
-
-      <div>
-        <h1>
-          Compra #{{ compra()!.id }}
-        </h1>
-
-        <p>
-          Detalle completo de la compra.
-        </p>
-      </div>
-
-    </div>
-
-    <div class="resumen">
-
-      <div>
-        <span>Fecha</span>
-        <strong>
-          {{ compra()!.fecha | date:'dd/MM/yyyy HH:mm' }}
-        </strong>
-      </div>
-
-      <div>
-        <span>Estado</span>
-        <strong>
-          {{ compra()!.estado }}
-        </strong>
-      </div>
-
-      <div>
-        <span>Total</span>
-        <strong>
-          S/ {{ compra()!.total | number:'1.2-2' }}
-        </strong>
-      </div>
-
-    </div>
-
-    <div class="tabla-contenedor">
-
-      <table>
-
-        <thead>
-        <tr>
-          <th>Producto</th>
-          <th>Cantidad</th>
-          <th>Precio unitario</th>
-          <th>Subtotal</th>
-        </tr>
-        </thead>
-
-        <tbody>
-
-          @for (
-            detalle of compra()!.detalles;
-            track detalle.id
-            ) {
-
-            <tr>
-
-              <td>
-                {{ detalle.productoNombre }}
-              </td>
-
-              <td>
-                {{ detalle.cantidad }}
-              </td>
-
-              <td>
-                S/
-                {{ detalle.precioUnitario | number:'1.2-2' }}
-              </td>
-
-              <td>
-                S/
-                {{
-                  detalle.cantidad
-                  * detalle.precioUnitario
-                    | number:'1.2-2'
-                }}
-              </td>
-
-            </tr>
-
-          }
-
-        </tbody>
-
-      </table>
-
     </div>
 
   }
 
-</div>
+  @if (cargando()) {
+
+    <div class="loading-box">
+      Cargando información de la compra...
+    </div>
+
+  } @else if (compra(); as compraActual) {
+
+    <div class="info-grid">
+
+      <article class="info-card">
+
+        <span class="info-label">
+          Número de compra
+        </span>
+
+        <strong class="info-value">
+          #{{ compraActual.id }}
+        </strong>
+
+        <span class="info-description">
+          Identificador interno
+        </span>
+
+      </article>
+
+      <article class="info-card">
+
+        <span class="info-label">
+          Fecha
+        </span>
+
+        <strong class="info-value small">
+          {{
+            compraActual.fecha
+              | date:'dd/MM/yyyy'
+          }}
+        </strong>
+
+        <span class="info-description">
+          {{
+            compraActual.fecha
+              | date:'HH:mm'
+          }}
+        </span>
+
+      </article>
+
+      <article class="info-card">
+
+        <span class="info-label">
+          Estado
+        </span>
+
+        <div class="status-container">
+
+          @if (
+            compraActual.estado === 'ENTREGADA'
+            ) {
+
+            <span class="badge badge-success">
+              Entregada
+            </span>
+
+          } @else {
+
+            <span class="badge badge-info">
+              En tránsito
+            </span>
+
+          }
+
+        </div>
+
+        <span class="info-description">
+          Estado actual de la compra
+        </span>
+
+      </article>
+
+      <article class="info-card destacado">
+
+        <span class="info-label">
+          Total
+        </span>
+
+        <strong class="info-value total">
+          S/
+          {{
+            compraActual.total
+              | number:'1.2-2'
+          }}
+        </strong>
+
+        <span class="info-description">
+          Importe total registrado
+        </span>
+
+      </article>
+
+    </div>
+
+    <section class="products-card">
+
+      <div class="products-header">
+
+        <div>
+
+          <h2>
+            Productos de la compra
+          </h2>
+
+          <p>
+            Detalle de los productos, cantidades y precios registrados.
+          </p>
+
+        </div>
+
+        <span class="results-badge">
+          {{ compraActual.detalles.length }}
+          productos
+        </span>
+
+      </div>
+
+      <div class="table-responsive">
+
+        <table>
+
+          <thead>
+
+          <tr>
+            <th>Producto</th>
+            <th>Cantidad</th>
+            <th>Precio unitario</th>
+            <th>Subtotal</th>
+          </tr>
+
+          </thead>
+
+          <tbody>
+
+            @for (
+              detalle of compraActual.detalles;
+              track detalle.id
+              ) {
+
+              <tr>
+
+                <td>
+
+                  <div class="product-cell">
+
+                    <div class="product-icon">
+                      P
+                    </div>
+
+                    <div class="product-info">
+
+                      <strong>
+                        {{ detalle.productoNombre }}
+                      </strong>
+
+                      <span>
+                        Producto #{{ detalle.productoId }}
+                      </span>
+
+                    </div>
+
+                  </div>
+
+                </td>
+
+                <td>
+
+                  <span class="quantity">
+                    {{ detalle.cantidad }}
+                  </span>
+
+                </td>
+
+                <td>
+
+                  S/
+                  {{
+                    detalle.precioUnitario
+                      | number:'1.2-2'
+                  }}
+
+                </td>
+
+                <td>
+
+                  <strong>
+                    S/
+                    {{
+                      detalle.precioUnitario
+                      * detalle.cantidad
+                        | number:'1.2-2'
+                    }}
+                  </strong>
+
+                </td>
+
+              </tr>
+
+            }
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+      <div class="purchase-total">
+
+        <span>
+          Total de la compra
+        </span>
+
+        <strong>
+          S/
+          {{
+            compraActual.total
+              | number:'1.2-2'
+          }}
+        </strong>
+
+      </div>
+
+    </section>
+
+  }
+
+</section>

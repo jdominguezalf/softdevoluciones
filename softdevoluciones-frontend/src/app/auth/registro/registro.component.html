@@ -1,8 +1,4 @@
-<div class="login-page">
-
-  <!-- =========================
-       PANEL VISUAL
-       ========================= -->
+<div class="register-page">
 
   <section class="visual-panel">
 
@@ -34,28 +30,26 @@
       <div class="hero-copy">
 
         <span class="hero-badge">
-          Gestión simple y organizada
+          Tu cuenta, tu seguimiento
         </span>
 
         <h1>
-          Un proceso de devolución
-          <span>más claro para todos.</span>
+          Empieza a gestionar tus
+          <span>devoluciones de forma simple.</span>
         </h1>
 
         <p>
-          Consulta compras, registra solicitudes y gestiona
-          cada etapa del proceso desde una plataforma centralizada.
+          Crea tu cuenta para consultar tus compras,
+          registrar solicitudes y conocer el estado
+          de cada devolución.
         </p>
 
       </div>
 
       <div class="illustration-wrapper">
 
-        <div class="illustration-decoration decoration-one"></div>
-        <div class="illustration-decoration decoration-two"></div>
-
         <img
-          src="/images/login-devoluciones.png"
+          src="/images/Crea_tu_cuenta.png"
           alt="Proceso digital de gestión de devoluciones"
           class="hero-image"
         >
@@ -68,11 +62,11 @@
 
           <div>
             <strong>
-              Solicitud
+              Regístrate
             </strong>
 
             <span>
-              Registro sencillo
+              Crea tu cuenta
             </span>
           </div>
 
@@ -86,11 +80,11 @@
 
           <div>
             <strong>
-              Seguimiento
+              Accede
             </strong>
 
             <span>
-              Estado actualizado
+              Gestiona tus solicitudes
             </span>
           </div>
 
@@ -107,13 +101,15 @@
           </span>
 
           <div>
+
             <strong>
-              Flujo controlado
+              Tus compras
             </strong>
 
             <small>
-              Seguimiento de cada etapa
+              Consulta la información asociada a tu cuenta
             </small>
+
           </div>
 
         </div>
@@ -125,13 +121,15 @@
           </span>
 
           <div>
+
             <strong>
-              Información centralizada
+              Tus solicitudes
             </strong>
 
             <small>
-              Compras y solicitudes en un solo lugar
+              Registra devoluciones en pocos pasos
             </small>
+
           </div>
 
         </div>
@@ -143,13 +141,15 @@
           </span>
 
           <div>
+
             <strong>
-              Acceso seguro
+              Tu seguimiento
             </strong>
 
             <small>
-              Autenticación protegida
+              Consulta el estado del proceso
             </small>
+
           </div>
 
         </div>
@@ -176,14 +176,9 @@
 
   </section>
 
-
-  <!-- =========================
-       FORMULARIO
-       ========================= -->
-
   <section class="form-panel">
 
-    <div class="login-container">
+    <div class="register-container">
 
       <div class="mobile-brand">
 
@@ -205,18 +200,18 @@
 
       </div>
 
-      <div class="login-header">
+      <div class="register-header">
 
-        <span class="login-label">
-          Acceso al sistema
+        <span class="register-label">
+          Nueva cuenta
         </span>
 
         <h2>
-          Bienvenido
+          Crear cuenta
         </h2>
 
         <p>
-          Ingresa tus credenciales para continuar.
+          Completa tus datos para comenzar.
         </p>
 
       </div>
@@ -232,7 +227,7 @@
           <div>
 
             <strong>
-              No pudimos iniciar sesión
+              No pudimos crear tu cuenta
             </strong>
 
             <span>
@@ -247,8 +242,51 @@
 
       <form
         [formGroup]="formulario"
-        (ngSubmit)="iniciarSesion()"
+        (ngSubmit)="registrar()"
       >
+
+        <div class="field">
+
+          <label for="nombre">
+            Nombre completo
+          </label>
+
+          <div
+            class="input-group"
+            [class.input-error]="
+              formulario.controls.nombre.touched
+              &&
+              formulario.controls.nombre.invalid
+            "
+          >
+
+            <span class="input-prefix">
+              U
+            </span>
+
+            <input
+              id="nombre"
+              type="text"
+              formControlName="nombre"
+              placeholder="Ej. Carlos Ramírez"
+              autocomplete="name"
+            >
+
+          </div>
+
+          @if (
+            formulario.controls.nombre.touched
+            &&
+            formulario.controls.nombre.invalid
+            ) {
+
+            <small class="validation-error">
+              Ingresa un nombre válido.
+            </small>
+
+          }
+
+        </div>
 
         <div class="field">
 
@@ -320,8 +358,8 @@
                   : 'password'
               "
               formControlName="password"
-              placeholder="Ingresa tu contraseña"
-              autocomplete="current-password"
+              placeholder="Mínimo 8 caracteres"
+              autocomplete="new-password"
             >
 
             <button
@@ -345,7 +383,7 @@
             ) {
 
             <small class="validation-error">
-              Ingresa tu contraseña.
+              La contraseña debe tener al menos 8 caracteres.
             </small>
 
           }
@@ -354,7 +392,7 @@
 
         <button
           type="submit"
-          class="login-button"
+          class="register-button"
           [disabled]="cargando()"
         >
 
@@ -363,13 +401,13 @@
             <span class="spinner"></span>
 
             <span>
-              Iniciando sesión...
+              Creando cuenta...
             </span>
 
           } @else {
 
             <span>
-              Iniciar sesión
+              Crear cuenta
             </span>
 
             <span class="button-arrow">
@@ -387,7 +425,7 @@
         <span></span>
 
         <small>
-          ¿Primera vez aquí?
+          ¿Ya tienes una cuenta?
         </small>
 
         <span></span>
@@ -396,10 +434,10 @@
 
       <button
         type="button"
-        class="register-button"
-        (click)="irRegistro()"
+        class="login-button"
+        (click)="irLogin()"
       >
-        Crear una cuenta
+        Iniciar sesión
 
         <span>
           →
@@ -415,11 +453,11 @@
         <div>
 
           <strong>
-            Acceso protegido
+            Cuenta protegida
           </strong>
 
           <span>
-            Tus credenciales se transmiten de forma segura.
+            Tus credenciales se almacenan de forma segura.
           </span>
 
         </div>
